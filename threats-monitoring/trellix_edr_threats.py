@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Written by mohlcyber v.1.7 (13.06.2022)
+# Updated by Trellix v.1.8 (15.2.2013)
 # Script to retrieve all threats from the monitoring dashboard
 
 import sys
@@ -20,9 +21,9 @@ load_dotenv(verbose=True)
 
 class EDR():
     def __init__(self):
-        self.iam_url = 'preprod.iam.mcafee-cloud.com/iam/v1.1'
-        if edr_region == 'Local':
-            self.base_url = 'us-west-2-api-inteks-ls.mvisionapiedr.net'
+        self.iam_url = 'iam.mcafee-cloud.com/iam/v1.1'
+        if edr_region == 'EU':
+            self.base_url = 'soc.eu-central-1.trellix.com'
         elif edr_region == 'US-W':
             self.base_url = 'soc.trellix.com'
         elif edr_region == 'US-E':
@@ -48,9 +49,7 @@ class EDR():
         self.cache_fname = '{0}/cache.log'.format(cache_dir)
         if os.path.isfile(self.cache_fname):
             cache = open(self.cache_fname, 'r')
-            logger.debug('last detections is '.format(cache))
             last_detection = datetime.strptime(cache.read(), '%Y-%m-%dT%H:%M:%SZ')
-            
             last_detection_utc = last_detection.replace(tzinfo=pytz.UTC)
             next_pull = last_detection_utc.astimezone(tz.tzlocal()) + timedelta(seconds=1)
 
@@ -83,7 +82,7 @@ class EDR():
 
             if res.ok:
                 token = res.json()['access_token']
-                #token='eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IndCTlpJN1JnWFlncmFkdHJYU3Z3dXZtVlVkRSIsImtpZCI6IndCTlpJN1JnWFlncmFkdHJYU3Z3dXZtVlVkRSJ9.eyJpc3MiOiJodHRwczovL3ByZXByb2QuaWFtLm1jYWZlZS1jbG91ZC5jb20vaWFtL3YxLjAiLCJuYmYiOjE2NzYwMDMxNzUsInN1YiI6IjAwdTFlZTk0bWJ6YnRNQkljMGg4Iiwic2NvcGUiOiJlcG8uYWRtaW4gbWkudXNlci5jb25maWcgc29jLmFjdC50ZyBzb2MuaHRzLmMgc29jLmh0cy5yIHNvYy5ydHMuYyBzb2MucnRzLnIgb3BlbmlkIiwidGVuYW50X2lkIjoiN0U4N0I0NEYtODBEQi00NzM1LUFGMDQtRkVCNUFDNkYxOTY2IiwiYXVkIjoibWNhZmVlIiwiZ2l2ZW5fbmFtZSI6IkZOMjgxMDQwMiIsImNsaWVudF9pZCI6IjBvYWU2dmZqNmdDRUlzTUlkMGg3IiwibG9jYWxlIjoiZW5fVVMiLCJleHAiOjE2NzYwODk1ODUsImlkcCI6IjAwb2VwMnl2b3FiS1NNOWtOMGg3IiwiZW1haWwiOiJ0ZXN0MjgxMDQwMkB5b3BtYWlsLkNPTSIsImZhbWlseV9uYW1lIjoiTE4yODEwNDAyIiwidG9rZW5faWQiOiJOQ01nYW9mQTliSFVDWDZVLV8xbVM1MGZDIiwiem9uZWluZm8iOiIiLCJsb2dpbl9oaW50IjoidGVzdDI4MTA0MDJAeW9wbWFpbC5DT00iLCJub25jZSI6IiJ9.fK7aI1zqaYfy5MxzCvdm8GpO5j3fjG-EK2-qukDWsP0U0FDB228UlWx8huwtXKwLs2_bN4egBKEw9lLN1ELDOKhmpRLKvYTO7zj8QwAy2F6LjXZr03J4-bhYJY8gwIumvXbtxdHFK6enU3nWYU-XW0OEp0-gROMBAAnlurVTGeySurTKXQ3C629jYD4VCJBIHJudhI0rLCJaW61gs1ooIytCzm5Gd6I65izzaBhnUHJCSyKAg-4-SIx0PhCZs9SvhlWfT9jR7UheKD0MiGEELzAfIvCujROoS31_PQMfV4LrN9vJzjGI_ZhfB1u3HMH2Uba_dg2dKVyB9aA5fbvMZw'
+                logger.debug('clien token ===============  {}'.format(token))
                 self.session.headers = {'Authorization': 'Bearer {}'.format(token)}
                 logger.debug('AUTHENTICATION: Successfully authenticated.')
             else:
@@ -131,7 +130,6 @@ class EDR():
                         if os.path.isfile(self.cache_fname):
                             cache = open(self.cache_fname, 'r')
                             last_detection = datetime.strptime(cache.read(), '%Y-%m-%dT%H:%M:%SZ')
-                            logger.debug('threat last detection datae {}'.format(last_detection))
                             cache.close()
                             if last_detection < (datetime.strptime(res['data'][0]['attributes']['lastDetected'], '%Y-%m-%dT%H:%M:%SZ')):
                                 logger.debug('More recent detection timestamp detected. Updating cache.log.')
@@ -146,46 +144,44 @@ class EDR():
                             cache.close()
 
                         for threat in res['data']:
-                            threat_resp=self.json_convertor(threat)
+                            threat=self.mvision_to_martin_formatter(threat)
                             affhosts = self.get_affected_hosts(threat['id'])
                             ddetect_count = 0
                             for host in affhosts:
                                 detections = self.get_detections(threat['id'], host['id'])
 
                                 for detection in detections:
+                                    detection=self.mvision_to_martin_formatter(detection)
                                     threat['detection'] = detection
-                                    detection_resp=self.json_convertor(detection)
-                                    threat_resp['detection']=detection_resp
                                     logger.debug('our detection is {}'.format(detection))
-                                    traceid = detection['attributes']['traceId']
-                                    maguid = detection['attributes']['host']['maGuid']
-                                    sha256 = detection['attributes']['sha256']
+                                    traceid = detection['traceId']
+                                    maguid = detection['host']['maGuid']
+                                    sha256 = detection['sha256']
 
                                     threat['url'] = 'https://ui.{0}/monitoring/#/workspace/72,TOTAL_THREATS,{1}?traceId={2}&maGuid={3}&sha256={4}' \
                                         .format(self.base_url, threat['id'], traceid, maguid, sha256)
-                                    threat_resp['url']=threat['url']
                                     logger.debug(json.dumps(threat))
-                                    logger.info('Retrieved new MVISION EDR Threat Detection. {0}'.format(threat['attributes']['name']))
+                                    logger.info('Retrieved new MVISION EDR Threat Detection. {0}'.format(threat['name']))
 
                                     if syslog_ip and syslog_port:
-                                        syslog.info(json.dumps(threat_resp, sort_keys=True))
+                                        syslog.info(json.dumps(threat, sort_keys=True))
                                         logger.info('Successfully send data to Syslog IP {}'.format(syslog_ip))
 
                                     if threat_log == 'True':
                                         if os.path.exists(threat_dir) is False:
                                             os.mkdir(threat_dir)
 
-                                        time_detect = detection['attributes']['firstDetected']
+                                        time_detect = detection['firstDetected']
                                         ptime_detect = datetime.strptime(time_detect, '%Y-%m-%dT%H:%M:%SZ')
-                                        filename = '{}-{}-{}-{}.log'.format(ptime_detect.strftime('%Y%m%d%H%M%S'), threat['attributes']['name'],threat['id'],host['id'])
+                                        filename = '{}-{}.log'.format(ptime_detect.strftime('%Y%m%d%H%M%S'), threat['name'])
                                         file = open('{}/{}'.format(threat_dir, filename), 'w')
-                                        file.write(json.dumps(threat_resp))
+                                        file.write(json.dumps(threat))
                                         file.close()
 
                                     tdetect += 1
                                     ddetect_count += 1
 
-                            logger.debug('For threat {0} identified {1} new detections.'.format(threat['attributes']['name'], ddetect_count))
+                            logger.debug('For threat {0} identified {1} new detections.'.format(threat['name'], ddetect_count))
                             tthreat += 1
 
                     else:
@@ -298,35 +294,20 @@ class EDR():
 
     def mvision_to_martin_formatter(self,source):
         data = {}
-        thisdict=json.loads(json.dumps(source))
-        for x in thisdict:
+        dict=json.loads(json.dumps(source))
+        for x in dict:
             if(x=='type'):
                 continue
             if(x=='attributes'):
-                nesteddict=json.loads(json.dumps(thisdict[x]))
-                for y in nesteddict:
-                    data[y]=nesteddict[y]
+                nested_dict=json.loads(json.dumps(dict[x]))
+                for y in nested_dict:
+                    data[y]=nested_dict[y]
             else:
-                data[x]=thisdict[x]
+                data[x]=dict[x]
 
         return data
 
-def load_env():
-    os.environ['EDR_REGION'] = 'Local'
-    os.environ['EDR_CLIENT_ID'] = 'EwfiwMeGFh41Xm_4a1UfULhQL'
-    os.environ['EDR_CLIENT_SECRET'] = 'Ilo4INGOvI0Rn5esIz03xKXWf'
-    os.environ['INTERVAL'] = '300'
-    os.environ['INITIAL_PULL'] = '30'
-    os.environ['SYSLOG_IP'] = '10.54.1.19'
-    os.environ['SYSLOG_PORT'] = '514'
-    os.environ['CACHE_DIR'] = '/home/mcafee/work/python_task_snj/martin_ohl_cache'
-    os.environ['LOG_LEVEL'] = 'DEBUG'
-    os.environ['LOG_DIR'] = '/home/mcafee/work/python_task_snj/martin_logs'
-    os.environ['THREAT_LOG'] = 'True'
-    os.environ['THREAT_DIR'] = '/home/mcafee/work/python_task_snj/martin_threats'
-    os.environ['X_API_KEY']='UTM0bXRyM1RockZMR1BlMm9CSFZiTXBBanNQWnlCVjlHSVExUFJmNW1jZzp1cy13ZXN0LTI'
 if __name__ == '__main__':
-    load_env()
     edr_region = os.getenv('EDR_REGION')
     edr_client_id = os.getenv('EDR_CLIENT_ID')
     edr_client_secret = os.getenv('EDR_CLIENT_SECRET')
@@ -368,7 +349,6 @@ if __name__ == '__main__':
                                                         backupCount=5)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-    logger.debug('@@@@@@@@@@@@@@@@@@@ {}'.format(edr_client_id))
     if syslog_ip and syslog_port:
         syslog = logging.getLogger('syslog')
         syslog.setLevel(log_level)
