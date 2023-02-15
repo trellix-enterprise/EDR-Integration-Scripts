@@ -21,7 +21,7 @@ Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_gener
 1. Place the script in an accessible directory e.g.
 
    ```
-   /opt/script/mvision_edr_threats.py
+   /opt/script/trellix_edr_threats.py
    ```
 
 
@@ -75,7 +75,7 @@ Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_gener
 4. Create a new file in the service directory
 
    ```
-   vim /etc/systemd/system/mvision_edr_threats.service
+   vim /etc/systemd/system/trellix_edr_threats.service
    ```
 
    Content:
@@ -88,7 +88,7 @@ Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_gener
    [Service]
    Type=simple
    WorkingDirectory=/opt/script
-   ExecStart=/usr/bin/python3 /opt/script/mvision_edr_threats.py
+   ExecStart=/usr/bin/python3 /opt/script/trellix_edr_threats.py
    Restart=on-failure
    RestartSec=5
 
@@ -105,18 +105,18 @@ Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_gener
 6. Start the service
 
    ```
-   systemctl start mvision_edr_threats.service
+   systemctl start trellix_edr_threats.service
    ```
    To start the service on system startup execute the following command
 
    ```
-   systemctl enable mvision_edr_threats.service
+   systemctl enable trellix_edr_threats.service
    ```
    
 7. Check the status of the service
    
    ```
-   systemctl status mvision_edr_threats.service
+   systemctl status trellix_edr_threats.service
    ```
    ![1](https://user-images.githubusercontent.com/25227268/173325218-0f6413fa-c44d-4509-8d3d-44eca0b9c726.png)
 
