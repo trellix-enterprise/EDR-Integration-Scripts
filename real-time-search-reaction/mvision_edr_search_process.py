@@ -13,7 +13,8 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 class EDR():
     def __init__(self):
-        self.iam_url = 'preprod.iam.mcafee-cloud.com/iam/v1.0'
+        self.iam_url = 'preprod.iam.mcafee-cloud.com/iam/v1.1'
+
         if args.region == 'EU':
             self.base_url = 'soc.eu-central-1.mcafee.com'
         elif args.region == 'US-W':

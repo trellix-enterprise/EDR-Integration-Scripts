@@ -14,7 +14,7 @@ import mvision_action_history_legacy
 
 class EDR():
     def __init__(self):
-        self.iam_url = 'preprod.iam.mcafee-cloud.com/iam/v1.0'
+        self.iam_url = 'preprod.iam.mcafee-cloud.com/iam/v1.1'
 
         if args.region == 'EU':
             self.base_url = 'soc.eu-central-1.mcafee.com'
@@ -26,6 +26,8 @@ class EDR():
             self.base_url = 'soc.ap-southeast-2.mcafee.com'
         elif args.region == 'GOV':
             self.base_url = 'soc.mcafee-gov.com'
+
+        self.base_url = 'us-west-2-api-inteks-ls.mvisionapiedr.net'
 
         self.logging()
 
