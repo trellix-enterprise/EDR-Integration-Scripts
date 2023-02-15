@@ -11,7 +11,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 class EDR():
     def __init__(self):
         self.iam_url = 'preprod.iam.mcafee-cloud.com/iam/v1.1'
-        
+
         if args.region == 'EU':
             self.base_url = 'soc.eu-central-1.mcafee.com'
         elif args.region == 'US-W':
@@ -23,7 +23,7 @@ class EDR():
         elif args.region == 'GOV':
             self.base_url = 'soc.mcafee-gov.com'
 
-        self.base_url = 'us-west-2-api-inteks-ls.mvisionapiedr.net'
+        self.base_url = 'us-west-2-api-inteks-ls.mvisionapiedr.net/edr/v2'
 
         self.logging()
 
@@ -94,7 +94,7 @@ class EDR():
                         }
                     }
 
-            res = self.session.post('https://{0}/edr/v2/searches/realtime'.format(self.base_url), json=payload)
+            res = self.session.post('https://{0}/searches/realtime'.format(self.base_url), json=payload)
 
             self.logger.debug('request url: {}'.format(res.url))    
             self.logger.debug('request headers: {}'.format(res.request.headers))
@@ -118,7 +118,7 @@ class EDR():
     def search_status(self, queryId):
         try:
             status = False
-            res = self.session.get('https://{0}/edr/v2/searches/queue-jobs/{1}'.format(self.base_url, str(queryId)), allow_redirects=False)
+            res = self.session.get('https://{0}/searches/queue-jobs/{1}'.format(self.base_url, str(queryId)), allow_redirects=False)
 
             self.logger.debug('request url: {}'.format(res.url))    
             self.logger.debug('request headers: {}'.format(res.request.headers))
@@ -137,7 +137,7 @@ class EDR():
 
     def search_result(self, queryId):
         try:
-            res = self.session.get('https://{0}/edr/v2/searches/realtime/{1}/results'.format(self.base_url, str(queryId)))
+            res = self.session.get('https://{0}/searches/realtime/{1}/results'.format(self.base_url, str(queryId)))
 
             self.logger.debug('request url: {}'.format(res.url))    
             self.logger.debug('request headers: {}'.format(res.request.headers))
@@ -191,7 +191,7 @@ class EDR():
                 }
             }
 
-            res = self.session.post('https://{0}/edr/v2/remediation/search'.format(self.base_url),
+            res = self.session.post('https://{0}/remediation/search'.format(self.base_url),
                                     json=payload)
 
             self.logger.debug('request url: {}'.format(res.url))

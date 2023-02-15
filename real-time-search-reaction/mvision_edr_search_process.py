@@ -26,7 +26,7 @@ class EDR():
         elif args.region == 'GOV':
             self.base_url = 'soc.mcafee-gov.com'
 
-        self.base_url = 'us-west-2-api-inteks-ls.mvisionapiedr.net'
+        self.base_url = 'us-west-2-api-inteks-ls.mvisionapiedr.net/edr/v2'
 
         self.logging()
 
@@ -98,7 +98,7 @@ class EDR():
             }
 
             res = self.session.post(
-                'https://{0}/edr/v2/searches/realtime'.format(self.base_url), json=payload)
+                'https://{0}/searches/realtime'.format(self.base_url), json=payload)
 
             self.logger.debug('request url: {}'.format(res.url))
             self.logger.debug(
@@ -125,7 +125,7 @@ class EDR():
     def search_status(self, queryId):
         try:
             status = False
-            res = self.session.get('https://{0}/edr/v2/searches/queue-jobs/{1}'.format(
+            res = self.session.get('https://{0}/searches/queue-jobs/{1}'.format(
                 self.base_url, str(queryId)), allow_redirects=False)
 
             self.logger.debug('request url: {}'.format(res.url))
@@ -149,7 +149,7 @@ class EDR():
     def search_result(self, queryId):
         try:
             res = self.session.get(
-                'https://{0}/edr/v2/searches/realtime/{1}/results'.format(self.base_url, str(queryId)))
+                'https://{0}/searches/realtime/{1}/results'.format(self.base_url, str(queryId)))
 
             self.logger.debug('request url: {}'.format(res.url))
             self.logger.debug(
@@ -206,7 +206,7 @@ class EDR():
                 }
             }
 
-            res = self.session.post('https://{0}/edr/v2/remediation/search'.format(self.base_url),
+            res = self.session.post('https://{0}/remediation/search'.format(self.base_url),
                                     json=payload)
 
             self.logger.debug('request url: {}'.format(res.url))

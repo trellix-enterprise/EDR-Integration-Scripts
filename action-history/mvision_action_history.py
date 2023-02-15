@@ -27,7 +27,7 @@ class EDR():
         elif args.region == 'GOV':
             self.base_url = 'soc.mcafee-gov.com'
 
-        self.base_url = 'us-west-2-api-inteks-ls.mvisionapiedr.net'
+        self.base_url = 'us-west-2-api-inteks-ls.mvisionapiedr.net/edr/v2'
 
         self.logging()
 
@@ -94,7 +94,7 @@ class EDR():
 
     def action_history(self):
         try:
-            res = self.session.get('https://{0}/edr/v2/remediation/actions?page[limit]={1}'
+            res = self.session.get('https://{0}/remediation/actions?page[limit]={1}'
                                    .format(self.base_url, str(self.limit)))
 
             self.logger.debug('request url: {}'.format(res.url))
