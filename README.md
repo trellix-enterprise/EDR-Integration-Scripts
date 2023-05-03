@@ -1,42 +1,128 @@
 # EDR-Integration-Scripts
+# MVISION EDR Threats (Monitoring)
 
-This is a collection of different MVISION EDR integration scripts. 
+This is a script to retrieve threats and detections from MVISION EDR (Monitoring Dashboard).
 
-## Client Credential Generator
+The following steps describe an example to run the provided script as a service under a Linux Operating system (CentOS).
+The script requires various parameters to execute incl. MVISION EDR Tenant Region, ClientId and ClientSecret.
 
-To authenticate against the MVISION EDR API, client credentials need to be generated with the [MVISION EDR Credential Generator](mvision_edr_creds_generator.py) first.
+There are multiple ways in securely provide credentials to the script. 
+- Password Vaults like Vault from Hashicorp (https://www.vaultproject.io/) or python vaults to store credentials securely. 
+- Using a hidden .env file to store credentials and provide credentials in form of environment variables to the script.
 
-1. Log on to MVISION EPO Console using your credentials
-2. Go to "Appliance and Server Registration" page from the menu
+The latter example will be described below.
 
-   ![1](https://user-images.githubusercontent.com/25227268/165046594-7af12d3c-a6fd-43fc-b88f-0381b08b1b9c.png)
-3. Click on "Add" button
-4. Choose client type "MVISION Endpoint Detection and Response"
-5. Enter number of clients (1)
+**Important** 
 
-   ![2](https://user-images.githubusercontent.com/25227268/165046797-2a913460-9f84-480e-a3a5-a9c358467e32.png)
-6. Click on the "Save" button
-7. Copy the "Token" value from the table under the section "MVISION Endpoint Detection and Response"
+Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.com/mohlcyber/McAfee-MVISION-EDR-Integrations/blob/master/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.com/mohlcyber/McAfee-MVISION-EDR-Integrations).
 
-   ![3](https://user-images.githubusercontent.com/25227268/165047049-6a40a72e-84fc-42a1-80ae-7bbfff9b56e5.png)
-8. Pass the token value as the input parameter to the [mvision_edr_creds_generator.py](mvision_edr_creds_generator.py) script
-9. The script will generate the client_id, client_secret and print on the output console / writes the output to a file (optional)
-10. Use the client_id, client_secret for authentication against the MVISION EDR API
+## Configuration
 
-## Sample Scripts 
+1. Place the script in an accessible directory e.g.
 
-[MVISION EDR Action History](action-history):
-This is a script to retrieve the action history from MVISION EDR.
+   ```
+   /opt/script/trellix_edr_threats.py
+   ```
 
-[MVISION EDR Activity Feeds Script](activity-feeds): 
-This is a script to consume activity feeds from MVISION EDR.
-The script contains various modules to ingest trace data into e.g. ServiceNow, TheHive, Syslog or Email.
 
-[MVISION EDR Device Search](device-search):
-This is a script to query the device search in MVISION EDR.
+2. Make sure the following dependencies are installed
 
-[MVISION EDR Real-Time-Search and Reaction Script](real-time-search-reaction): 
-This is a collections of scripts that will start RTS for hashes or process and provides the ability to execute reactions.
+   ```
+   python3 -m pip install requests python-dotenv python-dateutil pytz
+   ```
 
-[MVISION EDR Threats](threats-monitoring):
-This is a script to retrieve the threat detections from MVISION EDR (Monitoring Dashboard).
+
+3. Create a new file called .env in the same directory as the provided script (e.g. /opt/script/.env) and provide all required parameters. Leave empty if parameter does not apply.
+
+   ```
+   vim /opt/script/.env
+   ```
+
+   Content:
+   ```
+   # EDR settings (required)
+   EDR_REGION = US-E
+   EDR_CLIENT_ID = 
+   EDR_CLIENT_SECRET =
+   X_API_KEY=
+
+   # Pulling Interval in seconds (required)
+   INTERVAL  = 300
+
+   # Initial Pull in days
+   INITIAL_PULL = 3
+
+   # SYSLOG settings (optional)
+   SYSLOG_IP =
+   SYSLOG_PORT =
+   
+   # Cache File location (required)
+   CACHE_DIR = /opt/script
+
+   # Proxy settings (optional)
+   PROXY =
+   VALID =
+
+   # Logging (required)
+   LOG_LEVEL = DEBUG
+   LOG_DIR = /opt/script/logs
+
+   # Write Threat Detections into File (optional)
+   THREAT_LOG = True
+   THREAT_DIR = /opt/script/threats
+   ```
+
+4. Create a new file in the service directory
+
+   ```
+   vim /etc/systemd/system/trellix_edr_threats.service
+   ```
+
+   Content:
+   ```
+   [Unit]
+   Description=MVISION EDR Threat Pull
+   After=network-online.target
+   Wants=network-online.target
+
+   [Service]
+   Type=simple
+   WorkingDirectory=/opt/script
+   ExecStart=/usr/bin/python3 /opt/script/trellix_edr_threats.py
+   Restart=on-failure
+   RestartSec=5
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+5. Restart the systemctl daemon loader
+   
+   ```
+   systemctl daemon-reload
+   ```
+   
+6. Start the service
+
+   ```
+   systemctl start trellix_edr_threats.service
+   ```
+   To start the service on system startup execute the following command
+
+   ```
+   systemctl enable trellix_edr_threats.service
+   ```
+   
+7. Check the status of the service
+   
+   ```
+   systemctl status trellix_edr_threats.service
+   ```
+   ![1](https://user-images.githubusercontent.com/25227268/173325218-0f6413fa-c44d-4509-8d3d-44eca0b9c726.png)
+
+8. You can also check the logs of the service
+
+   ```
+   tail -f /opt/script/logs/mvedr_logger.log
+   ```
+   ![2](https://user-images.githubusercontent.com/25227268/173325628-7a044943-4df3-422e-a05e-764e3826c97e.png)
