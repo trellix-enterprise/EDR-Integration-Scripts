@@ -21,9 +21,9 @@ load_dotenv(verbose=True)
 
 class EDR():
     def __init__(self):
-        self.iam_url = 'iam.mcafee-cloud.com/iam/v1.1'
+        self.iam_url = 'preprod.iam.mcafee-cloud.com/iam/v1.1'
         if edr_region == 'EU':
-            self.base_url = 'soc.eu-central-1.trellix.com'
+            self.base_url = 'us-west-2-api-inteks-ls.mvisionapiedr.net'
         elif edr_region == 'US-W':
             self.base_url = 'soc.trellix.com'
         elif edr_region == 'US-E':
@@ -64,12 +64,12 @@ class EDR():
         logger.debug('New pulling date {0} - epoch {1}'.format(next_pull, self.epoch_pull))
 
         self.auth(creds)
-        self.limit = 10000
+        self.limit = 5000
 
     def auth(self, creds):
         try:
             payload = {
-                'scope': 'soc.hts.c soc.hts.r soc.rts.c soc.rts.r soc.qry.pr',
+                'scope': 'gsd.a.e openid soc.hts.c soc.hts.r soc.rts.c soc.rts.r soc.qry.pr mi.user.investigate soc.act.tg',
                 'grant_type': 'client_credentials',
                 'audience': 'mcafee'
             }
@@ -82,6 +82,7 @@ class EDR():
 
             if res.ok:
                 token = res.json()['access_token']
+                token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ii1qS2Z3ZlRXQVFmMzR0dXVLU00wR3VodHdhZyIsImtpZCI6Ii1qS2Z3ZlRXQVFmMzR0dXVLU00wR3VodHdhZyJ9.eyJpc3MiOiJodHRwczovL3ByZXByb2QuaWFtLm1jYWZlZS1jbG91ZC5jb20vaWFtL3YxLjAiLCJuYmYiOjE2ODMxMDc0NDMsInN1YiI6IjAwdTE1Y2d2bG52dEdMNlo4MGg4Iiwic2NvcGUiOiJtaS51c2VyLmNvbmZpZyBtaS51c2VyLmludmVzdGlnYXRlIHNvYy5hY3QudGcgdWFtOmFkbWluIG9wZW5pZCIsInRlbmFudF9pZCI6Ijg0MUFBREM0LTZCMTEtNEIzNi1CQ0M1LTdFRDM4N0NGMkVBQiIsImF1ZCI6Im1jYWZlZSIsImdpdmVuX25hbWUiOiJ2YXNhdiIsImNsaWVudF9pZCI6IjBvYWU2dmZqNmdDRUlzTUlkMGg3IiwibG9jYWxlIjoiZW5fVVMiLCJleHAiOjE2ODMxMTEwNTMsImlkcCI6IjAwb2VwMnl2b3FiS1NNOWtOMGg3IiwiZW1haWwiOiJ2YXNhdi1sb3dlcmludC0zQHlvcG1haWwuY29tIiwiZmFtaWx5X25hbWUiOiJsb3dlcmludCIsInRva2VuX2lkIjoiMlJJQ0xHYVowdWR0aWtoUnNTUGhOeERQdCIsInpvbmVpbmZvIjoiIiwibG9naW5faGludCI6InZhc2F2LWxvd2VyaW50LTNAeW9wbWFpbC5jb20iLCJub25jZSI6IiJ9.KlGfBTUiqSbNbCW8tvjD87hNwquk5t9gR4B9Lb-J2tLTD06CKMLSi1zswgoqIhVzimpfU-aTbEIBu8dUZOknBXOwAd75Jjn28yRYRsH1v8a24_xoxu3m33C4aKapscGZlujmjuU5iVuZyGVrM05MX-fElrFqESqavuMXUTbAdO-QgqtuG20TRQXxPjkmtwDI8MeWsU-xqyKNc5IiGp39MaG_6c96DeHnuOnJSA6SV23D3tWYdBaYRPjLD56GZZkWk1coW8xuxj7RhsgbNahqc9BSmC4269lqtF2Zr70Io1GJi5yHOB2KFkVW4w4I9ISbz49hToeeX5BrNG3r7wwemA'
                 logger.debug('clien token ===============  {}'.format(token))
                 self.session.headers = {'Authorization': 'Bearer {}'.format(token)}
                 logger.debug('AUTHENTICATION: Successfully authenticated.')
@@ -117,7 +118,7 @@ class EDR():
             while(tnextflag):
                 res = self.session.get(
                     'https://{0}/edr/v2/threats?sort=-lastDetected&filter={1}&from={2}&page[limit]={3}&page[offset]={4}'
-                        .format(self.base_url, json.dumps(filter), self.epoch_pull, self.limit, skip),headers=headers)
+                        .format(self.base_url, json.dumps(filter), 0, self.limit, skip),headers=headers)
 
                 if res.ok:
                     res = res.json()
@@ -215,8 +216,8 @@ class EDR():
             while(anextflag):
 
                 res = self.session.get(
-                    'https://{0}/edr/v2/threats/{1}/affectedhosts?sort=-rank&from={2}&page[limit]={3}&page[offset]={4}'
-                        .format(self.base_url, threatId, self.epoch_pull, self.limit, skip),headers=headers)
+                    'https://{0}/edr/v2/threats/{1}/affectedhosts?from={2}&page[limit]={3}&page[offset]={4}'
+                        .format(self.base_url, threatId, 0, self.limit, skip),headers=headers)
                 
                 if res.ok:
                     res = res.json()
@@ -262,8 +263,8 @@ class EDR():
                 }
 
                 res = self.session.get(
-                    'https://{0}/edr/v2/threats/{1}/detections?sort=-rank&from={2}&filter={3}&page[limit]={4}&page[offset]={5}'
-                        .format(self.base_url, threatId, self.epoch_pull, json.dumps(filter), self.limit, skip),headers=headers)
+                    'https://{0}/edr/v2/threats/{1}/detections?from={2}&filter={3}&page[limit]={4}&page[offset]={5}'
+                        .format(self.base_url, threatId, 0, json.dumps(filter), self.limit, skip),headers=headers)
 
                 if res.ok:
                     res = res.json()
@@ -308,6 +309,20 @@ class EDR():
         return data
 
 if __name__ == '__main__':
+    os.environ['EDR_REGION'] = 'EU'
+    os.environ['EDR_CLIENT_ID'] = 'TIU5966juO4le7CQqdvPLhfTS'
+    os.environ['EDR_CLIENT_SECRET'] = 'I52mOnprP1v3eJJsrY59vww7J'
+    os.environ['INTERVAL'] = '300'
+    os.environ['INITIAL_PULL'] = '3'
+    os.environ['SYSLOG_IP'] = '10.54.1.19'
+    os.environ['SYSLOG_PORT'] = '514'
+    os.environ['CACHE_DIR'] = './martin_ohl_cache'
+    os.environ['LOG_LEVEL'] = 'DEBUG'
+    os.environ['LOG_DIR'] = './martin_logs'
+    os.environ['THREAT_LOG'] = 'True'
+    os.environ['THREAT_DIR'] = './martin_threats'
+    os.environ['X_API_KEY'] = 'ECYPmTx9g01rWmT3TXUTs8mNkHjbaNSv7lAp6uov'
+
     edr_region = os.getenv('EDR_REGION')
     edr_client_id = os.getenv('EDR_CLIENT_ID')
     edr_client_secret = os.getenv('EDR_CLIENT_SECRET')
