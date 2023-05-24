@@ -7,7 +7,7 @@ Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_gener
 
 Search Hash Usage:
 ```
-usage: Usage: python mvision_edr_search_hash.py -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -H <HASH>
+usage: Usage: python mvision_edr_search_hash.py -C <CLIENT_ID> -S <CLIENT_SECRET> -R <REGION> -api_key <X_API_KEY> -H <HASH>
 
 MVISION EDR Python API
 
@@ -32,7 +32,7 @@ optional arguments:
 Search Process Usage:
 
 ```
-usage: Usage: python mvision_edr_search_process.py -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -PN <process name>
+usage: Usage: python mvision_edr_search_process.py -C <CLIENT_ID> -S <CLIENT_SECRET> -R <REGION> -api_key <X_API_KEY> -PN <process name>
 
 MVISION EDR Python API
 
@@ -57,7 +57,7 @@ optional arguments:
 Search Filename Usage:
 
 ```
-usage: Usage: python mvision_edr_search_filename.py -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -H <HASH>
+usage: Usage: python mvision_edr_search_filename.py -C <CLIENT_ID> -S <CLIENT_SECRET> -R <REGION> -api_key <X_API_KEY> -F <FILE>
 
 MVISION EDR Python API
 
