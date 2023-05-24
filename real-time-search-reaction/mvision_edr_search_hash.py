@@ -36,7 +36,7 @@ class EDR():
         creds = (args.client_id, args.client_secret)
         self.auth(creds)
 
-        self.pname = args.process
+        self.hash = args.hash
 
     def logging(self):
         self.logger = logging.getLogger('logs')
@@ -103,7 +103,7 @@ class EDR():
                 "data": {
                     "type": "realTimeSearches",
                     "attributes": {
-                        "query": "HostInfo hostname, ip_address and Files name, " + str(type)+", status, full_name  where Files " + str(type)+" EQUALS "+str(self.hash)
+                        "query": "HostInfo hostname, ip_address and Files name, " + str(type)+", status, full_name where Files " + str(type)+" equals "+str(self.hash)
                     }
                 }
             }

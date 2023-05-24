@@ -36,7 +36,7 @@ class EDR():
         creds = (args.client_id, args.client_secret)
         self.auth(creds)
 
-        self.hash = args.hash
+        self.pname = args.process
 
     def logging(self):
         self.logger = logging.getLogger('logs')
