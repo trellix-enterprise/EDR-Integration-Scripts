@@ -3,7 +3,7 @@
 This is a script to retrieve the action history from MVISION EDR. 
 
 The script requires tenant_region, client_id , client_secret and api key to pull the action history. 
-Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.com/mohlcyber/McAfee-MVISION-EDR-Integrations/blob/master/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.com/mohlcyber/McAfee-MVISION-EDR-Integrations).
+Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.trellix.com/trellix-edr/EDR-Integration-Scripts/blob/develop/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-edr/EDR-Integration-Scripts).
 
 Usage: 
 
@@ -12,7 +12,7 @@ usage: python mvision_edr_action_history.py -R <REGION> -C <CLIENT_ID> -S <CLIEN
 
 MVISION EDR Python API
 
-optional arguments:
+arguments:
   -h, --help            show this help message and exit
   --region {EU,US-W,US-E,SY,GOV}, -R {EU,US-W,US-E,SY,GOV}
                         MVISION EDR Tenant Location

@@ -13,20 +13,18 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 class EDR():
     def __init__(self):
-        self.iam_url = 'preprod.iam.mcafee-cloud.com/iam/v1.1'
-
+        self.iam_url = 'iam.mcafee-cloud.com/iam/v1.1'
+       
         if args.region == 'EU':
-            self.base_url = 'soc.eu-central-1.mcafee.com'
+            self.base_url = 'soc.eu-central-1.trellix.com'
         elif args.region == 'US-W':
-            self.base_url = 'soc.mcafee.com'
+            self.base_url = 'soc.trellix.com'
         elif args.region == 'US-E':
-            self.base_url = 'soc.us-east-1.mcafee.com'
+            self.base_url = 'soc.us-east-1.trellix.com'
         elif args.region == 'SY':
-            self.base_url = 'soc.ap-southeast-2.mcafee.com'
+            self.base_url = 'soc.ap-southeast-2.trellix.com'
         elif args.region == 'GOV':
             self.base_url = 'soc.mcafee-gov.com'
-
-        self.base_url = 'us-west-2-api-inteks-ls.mvisionapiedr.net/edr/v2'
 
         self.logging()
 
@@ -112,8 +110,6 @@ class EDR():
                 'https://{0}/searches/realtime'.format(self.base_url), json=payload)
 
             self.logger.debug('request url: {}'.format(res.url))
-            self.logger.debug(
-                'request headers: {}'.format(res.request.headers))
             self.logger.debug('request body: {}'.format(res.request.body))
 
             if res.ok:
@@ -140,8 +136,6 @@ class EDR():
                 self.base_url, str(queryId)), allow_redirects=False)
 
             self.logger.debug('request url: {}'.format(res.url))
-            self.logger.debug(
-                'request headers: {}'.format(res.request.headers))
             self.logger.debug('request body: {}'.format(res.request.body))
 
             if res.status_code == 303:
@@ -162,8 +156,6 @@ class EDR():
                 'https://{0}/searches/realtime/{1}/results'.format(self.base_url, str(queryId)))
 
             self.logger.debug('request url: {}'.format(res.url))
-            self.logger.debug(
-                'request headers: {}'.format(res.request.headers))
             self.logger.debug('request body: {}'.format(res.request.body))
 
             if res.ok:
@@ -221,8 +213,6 @@ class EDR():
                                     json=payload)
 
             self.logger.debug('request url: {}'.format(res.url))
-            self.logger.debug(
-                'request headers: {}'.format(res.request.headers))
             self.logger.debug('request body: {}'.format(res.request.body))
 
             if res.ok:
