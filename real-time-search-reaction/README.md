@@ -2,16 +2,16 @@
 
 This is a collection of scripts to run Real-Time-Search and optional to execute reactions. 
 
-The script requires tenant_region, client_id and client_secret to execute real-time searches. 
-Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.com/mohlcyber/McAfee-MVISION-EDR-Integrations/blob/master/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.com/mohlcyber/McAfee-MVISION-EDR-Integrations).
+The script requires tenant_region, client_id and client_secret and api key to execute real-time searches. 
+Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.trellix.com/trellix-edr/EDR-Integration-Scripts/blob/develop/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-edr/EDR-Integration-Scripts).
 
 Search Hash Usage:
 ```
-usage: Usage: python mvision_edr_search_hash.py -C <CLIENT_ID> -S <CLIENT_SECRET> -R <REGION> -api_key <X_API_KEY> -H <HASH>
+usage: Usage: python mvision_edr_search_hash.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -H <HASH>
 
 MVISION EDR Python API
 
-optional arguments:
+arguments:
   -h, --help            show this help message and exit
   --region {EU,US-W,US-E,SY,GOV}, -R {EU,US-W,US-E,SY,GOV}
                         MVISION EDR Tenant Location
@@ -32,11 +32,11 @@ optional arguments:
 Search Process Usage:
 
 ```
-usage: Usage: python mvision_edr_search_process.py -C <CLIENT_ID> -S <CLIENT_SECRET> -R <REGION> -api_key <X_API_KEY> -PN <process name>
+usage: Usage: python mvision_edr_search_process.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -PN <process name>
 
 MVISION EDR Python API
 
-optional arguments:
+arguments:
   -h, --help            show this help message and exit
   --region {EU,US-W,US-E,SY,GOV}, -R {EU,US-W,US-E,SY,GOV}
                         MVISION EDR Tenant Location
@@ -57,11 +57,11 @@ optional arguments:
 Search Filename Usage:
 
 ```
-usage: Usage: python mvision_edr_search_filename.py -C <CLIENT_ID> -S <CLIENT_SECRET> -R <REGION> -api_key <X_API_KEY> -F <FILE>
+usage: Usage: python mvision_edr_search_filename.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -F <FILE>
 
 MVISION EDR Python API
 
-optional arguments:
+arguments:
   -h, --help            show this help message and exit
   --region {EU,US-W,US-E,SY,GOV}, -R {EU,US-W,US-E,SY,GOV}
                         MVISION EDR Tenant Location
