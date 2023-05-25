@@ -14,7 +14,7 @@ The latter example will be described below.
 
 **Important** 
 
-Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.com/mohlcyber/McAfee-MVISION-EDR-Integrations/blob/master/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.com/mohlcyber/McAfee-MVISION-EDR-Integrations).
+Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.trellix.com/trellix-edr/EDR-Integration-Scripts/blob/develop/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-edr/EDR-Integration-Scripts).
 
 ## Configuration
 
