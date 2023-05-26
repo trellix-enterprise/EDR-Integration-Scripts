@@ -3,7 +3,7 @@
 This is a script to retrieve the action history from MVISION EDR. 
 
 The script requires tenant_region, client_id , client_secret and api key to pull the action history. 
-Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.trellix.com/trellix-edr/EDR-Integration-Scripts/blob/develop/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-edr/EDR-Integration-Scripts).
+Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.trellix.com/trellix-products/EDR-Integration-Scripts/blob/develop/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-products/EDR-Integration-Scripts).
 
 Usage: 
 
