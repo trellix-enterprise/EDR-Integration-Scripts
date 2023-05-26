@@ -3,7 +3,7 @@
 This is a collection of scripts to run Real-Time-Search and optional to execute reactions. 
 
 The script requires tenant_region, client_id and client_secret and api key to execute real-time searches. 
-Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.trellix.com/trellix-edr/EDR-Integration-Scripts/blob/develop/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-edr/EDR-Integration-Scripts).
+Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.trellix.com/trellix-products/EDR-Integration-Scripts/blob/develop/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-products/EDR-Integration-Scripts).
 
 Search Hash Usage:
 ```
