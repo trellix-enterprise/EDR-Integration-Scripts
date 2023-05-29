@@ -189,7 +189,7 @@ class EDR():
                         logger.debug('No new threats identified. Exiting. {0}'.format(res))
                 elif res.status_code==429:
                      retry_interval=self.get_retryinterval(res)
-                     logger.debug('Rate Limit Exceed in Threats Api, retrying after  {}'.format(retry_interval))
+                     logger.debug('Rate Limit Exceed in Threats Api, retrying after  {} sec'.format(retry_interval))
                      time.sleep(int(retry_interval))            
                 else:
                     logger.error('Error in retrieving edr.get_threats(). Request url: {}'.format(res.url))
@@ -237,7 +237,7 @@ class EDR():
 
                 elif res.status_code==429:
                      retry_interval=self.get_retryinterval(res)
-                     logger.debug('Rate Limit Exceed in Affected Api, retrying after  {}'.format(retry_interval))
+                     logger.debug('Rate Limit Exceed in Affected Api, retrying after  {} sec'.format(retry_interval))
                      time.sleep(int(retry_interval))
 
                 else:
@@ -288,7 +288,7 @@ class EDR():
                             detections.append(detection)
                 elif res.status_code==429:
                      retry_interval=self.get_retryinterval(res)
-                     logger.debug('Rate Limit Exceed in Detections Api, retrying after  {}'.format(retry_interval))
+                     logger.debug('Rate Limit Exceed in Detections Api, retrying after  {} sec'.format(retry_interval))
                      time.sleep(int(retry_interval))
 
                 else:

@@ -235,6 +235,7 @@ class EDR():
                 self.logger.info(res.text)
             elif res.status_code==429:
                 retry_interval=self.get_retryinterval(res)
+                self.logger.debug('Rate Limit Exceed in reaction Api, retrying after {} sec'.format(retry_interval))
                 time.sleep(int(retry_interval))
                 self.exec_reaction(processName,tid,hid)
             else:
@@ -264,13 +265,13 @@ class EDR():
         return data
 
     def get_retryinterval(self,response):
-        logger.debug("\nResponse Header received:\n\n{}".format(response.headers))
+        self.logger.debug("\nResponse Header received:\n\n{}".format(response.headers))
         retry_val = "0"
         if 'Retry-After' in response.headers:
             retry_val = response.headers["Retry-After"]
-            logger.debug('\nRetry interval set to {} secs. Sleeping...'.format(retry_val))
+            self.logger.debug('\nRetry interval set to {} secs. Sleeping...'.format(retry_val))
         else:
-            logger.debug("\nRetry-after attribute is not present in response header..")
+            self.logger.debug("\nRetry-after attribute is not present in response header..")
         return retry_val
 
 if __name__ == '__main__':
