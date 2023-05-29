@@ -143,7 +143,7 @@ class EDR():
                         for hid in affhids:
                             self.exec_reaction(pname, tid, hid)
 
-                        #self.logger.info(json.dumps(threat))
+                        self.logger.info(json.dumps(threat))
 
                 else:
                     self.logger.info('No new threats identified. Exiting. {0}'.format(res))

@@ -187,7 +187,10 @@ class EDR():
 
                     else:
                         logger.debug('No new threats identified. Exiting. {0}'.format(res))
-
+                elif res.status_code==429:
+                     retry_interval=self.get_retryinterval(res)
+                     logger.debug('Rate Limit Exceed in Threats Api, retrying after  {}'.format(retry_interval))
+                     time.sleep(int(retry_interval))            
                 else:
                     logger.error('Error in retrieving edr.get_threats(). Request url: {}'.format(res.url))
                     logger.error('Error in retrieving edr.get_threats(). Request headers: {}'.format(res.request.headers))
@@ -231,6 +234,11 @@ class EDR():
                     else:
                         for affhost in res['data']:
                             affhosts.append(affhost)
+
+                elif res.status_code==429:
+                     retry_interval=self.get_retryinterval(res)
+                     logger.debug('Rate Limit Exceed in Affected Api, retrying after  {}'.format(retry_interval))
+                     time.sleep(int(retry_interval))
 
                 else:
                     logger.error('Error in retrieving edr.get_affectedHosts(). Request url: {}'.format(res.url))
@@ -279,9 +287,9 @@ class EDR():
                         for detection in res['data']:
                             detections.append(detection)
                 elif res.status_code==429:
-                     retry_interval=get_retryinterval(res)
+                     retry_interval=self.get_retryinterval(res)
                      logger.debug('Rate Limit Exceed in Detections Api, retrying after  {}'.format(retry_interval))
-                     time.sleep(retry_interval)
+                     time.sleep(int(retry_interval))
 
                 else:
                     logger.error('Error in retrieving edr.get_detections(). Request url: {}'.format(res.url))
@@ -313,16 +321,15 @@ class EDR():
 
         return data
     
-    def get_retryinterval(response):
-        print("\nResponse Header received:\n\n{}".format(response.headers))
+    def get_retryinterval(self,response):
+        logger.debug("\nResponse Header received:\n\n{}".format(response.headers))
         retry_val = "0"
         if 'Retry-After' in response.headers:
             retry_val = response.headers["Retry-After"]
-            retry_val = retry_val[:-1]
-            print('\nRetry interval set to {} secs. Sleeping...'.format(retry_val))
+            logger.debug('\nRetry interval set to {} secs. Sleeping...'.format(retry_val))
         else:
-            print("\nRetry-after attribute is not present in response header..")
-    return retry_val
+            logger.debug("\nRetry-after attribute is not present in response header..")
+        return retry_val
 
 if __name__ == '__main__':
     edr_region = os.getenv('EDR_REGION')
