@@ -233,6 +233,10 @@ class EDR():
             if res.ok:
                 self.logger.info('Successfully executed reaction for threatId {}'.format(tid))
                 self.logger.info(res.text)
+            elif res.status_code==429:
+                retry_interval=self.get_retryinterval(res)
+                time.sleep(int(retry_interval))
+                self.exec_reaction(processName,tid,hid)
             else:
                 self.logger.error('Error in retrieving edr.exec_reaction(). Error: {0} - {1}'
                                   .format(str(res.status_code), res.text))
@@ -258,6 +262,16 @@ class EDR():
                 data[x]=dict[x]
 
         return data
+
+    def get_retryinterval(self,response):
+        logger.debug("\nResponse Header received:\n\n{}".format(response.headers))
+        retry_val = "0"
+        if 'Retry-After' in response.headers:
+            retry_val = response.headers["Retry-After"]
+            logger.debug('\nRetry interval set to {} secs. Sleeping...'.format(retry_val))
+        else:
+            logger.debug("\nRetry-after attribute is not present in response header..")
+        return retry_val
 
 if __name__ == '__main__':
     usage = """python trellix_edr_threats.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -LL <LOG_LEVEL> """
