@@ -64,12 +64,14 @@ class EDR():
         logger.debug('New pulling date {0} - epoch {1}'.format(next_pull, self.epoch_pull))
 
         self.auth(creds)
-        self.limit = 10000
+        self.threatLimit = 10000
+        self.affectedHostLimit=5000
+        self.detectionsLimit=5000
 
     def auth(self, creds):
         try:
             payload = {
-                'scope': 'soc.hts.c soc.hts.r soc.rts.c soc.rts.r soc.qry.pr',
+                'scope': 'soc.hts.c soc.hts.r soc.rts.c soc.rts.r soc.qry.pr soc.act.tg',
                 'grant_type': 'client_credentials',
                 'audience': 'mcafee'
             }
@@ -82,7 +84,6 @@ class EDR():
 
             if res.ok:
                 token = res.json()['access_token']
-                logger.debug('clien token ===============  {}'.format(token))
                 self.session.headers = {'Authorization': 'Bearer {}'.format(token)}
                 logger.debug('AUTHENTICATION: Successfully authenticated.')
             else:
@@ -117,14 +118,14 @@ class EDR():
             while(tnextflag):
                 res = self.session.get(
                     'https://{0}/edr/v2/threats?sort=-lastDetected&filter={1}&from={2}&page[limit]={3}&page[offset]={4}'
-                        .format(self.base_url, json.dumps(filter), self.epoch_pull, self.limit, skip),headers=headers)
+                        .format(self.base_url, json.dumps(filter), self.epoch_pull, self.threatLimit, skip),headers=headers)
 
                 if res.ok:
                     res = res.json()
                     if res['links']['next'] == None:
                         tnextflag = False
                     else:
-                        skip = skip+self.limit
+                        skip = skip+self.threatLimit
 
                     if len(res['data']) > 0:
                         if os.path.isfile(self.cache_fname):
@@ -215,15 +216,15 @@ class EDR():
             while(anextflag):
 
                 res = self.session.get(
-                    'https://{0}/edr/v2/threats/{1}/affectedhosts?sort=-rank&from={2}&page[limit]={3}&page[offset]={4}'
-                        .format(self.base_url, threatId, self.epoch_pull, self.limit, skip),headers=headers)
+                    'https://{0}/edr/v2/threats/{1}/affectedhosts?from={2}&page[limit]={3}&page[offset]={4}'
+                        .format(self.base_url, threatId, self.epoch_pull, self.affectedHostLimit, skip),headers=headers)
                 
                 if res.ok:
                     res = res.json()
                     if res['links']['next'] == None:
                         anextflag = False
                     else:
-                        skip = skip+self.limit
+                        skip = skip+self.affectedHostLimit
 
                     if len(affhosts) == 0:
                         affhosts = res['data']
@@ -262,21 +263,26 @@ class EDR():
                 }
 
                 res = self.session.get(
-                    'https://{0}/edr/v2/threats/{1}/detections?sort=-rank&from={2}&filter={3}&page[limit]={4}&page[offset]={5}'
-                        .format(self.base_url, threatId, self.epoch_pull, json.dumps(filter), self.limit, skip),headers=headers)
+                    'https://{0}/edr/v2/threats/{1}/detections?from={2}&filter={3}&page[limit]={4}&page[offset]={5}'
+                        .format(self.base_url, threatId, self.epoch_pull, json.dumps(filter), self.detectionsLimit, skip),headers=headers)
 
                 if res.ok:
                     res = res.json()
                     if res['links']['next'] == None:
                         dnextflag = False
                     else:
-                        skip = skip+self.limit
+                        skip = skip+self.detectionsLimit
 
                     if len(detections) == 0:
                         detections = res['data']
                     else:
                         for detection in res['data']:
                             detections.append(detection)
+                elif res.status_code==429:
+                     retry_interval=get_retryinterval(res)
+                     logger.debug('Rate Limit Exceed in Detections Api, retrying after  {}'.format(retry_interval))
+                     time.sleep(retry_interval)
+
                 else:
                     logger.error('Error in retrieving edr.get_detections(). Request url: {}'.format(res.url))
                     logger.error('Error in retrieving edr.get_detections(). Request headers: {}'.format(res.request.headers))
@@ -306,6 +312,17 @@ class EDR():
                 data[x]=dict[x]
 
         return data
+    
+    def get_retryinterval(response):
+        print("\nResponse Header received:\n\n{}".format(response.headers))
+        retry_val = "0"
+        if 'Retry-After' in response.headers:
+            retry_val = response.headers["Retry-After"]
+            retry_val = retry_val[:-1]
+            print('\nRetry interval set to {} secs. Sleeping...'.format(retry_val))
+        else:
+            print("\nRetry-after attribute is not present in response header..")
+    return retry_val
 
 if __name__ == '__main__':
     edr_region = os.getenv('EDR_REGION')
