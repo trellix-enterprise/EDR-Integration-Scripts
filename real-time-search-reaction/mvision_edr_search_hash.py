@@ -264,7 +264,7 @@ class EDR():
 
 
 if __name__ == '__main__':
-    usage = """Usage: python mvision_edr_search_hash.py -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -H <HASH>"""
+    usage = """Usage: python mvision_edr_search_hash.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -H <HASH>"""
     title = 'MVISION EDR Python API'
     parser = ArgumentParser(description=title, usage=usage,
                             formatter_class=RawTextHelpFormatter)
