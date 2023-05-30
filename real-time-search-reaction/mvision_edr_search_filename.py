@@ -240,7 +240,7 @@ class EDR():
                                       line_no=exc_tb.tb_lineno, error=str(error)))
 
 if __name__ == '__main__':
-    usage = """Usage: python mvision_edr_search_filename.py -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -H <HASH>"""
+    usage = """Usage: python mvision_edr_search_filename.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -H <HASH>"""
     title = 'MVISION EDR Python API'
     parser = ArgumentParser(description=title, usage=usage, formatter_class=RawTextHelpFormatter)
 
