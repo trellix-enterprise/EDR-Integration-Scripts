@@ -138,13 +138,12 @@ class EDR():
 
                         pname = threat['name']
                         tid = threat['id']
-                        #caseid = self.get_case(pname, tid)
                         affhids = self.get_affhosts(tid)
 
                         for hid in affhids:
                             self.exec_reaction(pname, tid, hid)
 
-                        #self.logger.info(json.dumps(threat))
+                        self.logger.info(json.dumps(threat))
 
                 else:
                     self.logger.info('No new threats identified. Exiting. {0}'.format(res))
@@ -182,33 +181,6 @@ class EDR():
                 return detections
             else:
                 self.logger.error('Error in retrieving edr.get_detections(). Error: {0} - {1}'
-                                  .format(str(res.status_code), res.text))
-                exit()
-
-        except Exception as error:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            self.logger.error("Error in {location}.{funct_name}() - line {line_no} : {error}"
-                              .format(location=__name__, funct_name=sys._getframe().f_code.co_name,
-                                      line_no=exc_tb.tb_lineno, error=str(error)))
-
-    def get_case(self, pName, tId):
-        try:
-            data = {
-                'processName': pName,
-                'threatId': int(tId)
-            }
-            self.session.headers = {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IlNhdDR4R0xOZUoxc3Vua2t0YnpxcUFLUjJoZyIsImtpZCI6IlNhdDR4R0xOZUoxc3Vua2t0YnpxcUFLUjJoZyJ9.eyJpc3MiOiJodHRwczovL3ByZXByb2QuaWFtLm1jYWZlZS1jbG91ZC5jb20vaWFtL3YxLjAiLCJuYmYiOjE2NzYyODAyMjQsInN1YiI6IjAwdTE1Y2d2bG52dEdMNlo4MGg4Iiwic2NvcGUiOiJtaS51c2VyLmNvbmZpZyBtaS51c2VyLmludmVzdGlnYXRlIHNvYy5hY3QudGcgdWFtOmFkbWluIG9wZW5pZCIsInRlbmFudF9pZCI6Ijg0MUFBREM0LTZCMTEtNEIzNi1CQ0M1LTdFRDM4N0NGMkVBQiIsImF1ZCI6Im1jYWZlZSIsImdpdmVuX25hbWUiOiJ2YXNhdiIsImNsaWVudF9pZCI6IjBvYWU2dmZqNmdDRUlzTUlkMGg3IiwibG9jYWxlIjoiZW5fVVMiLCJleHAiOjE2NzYzNjY2MzQsImlkcCI6IjAwb2VwMnl2b3FiS1NNOWtOMGg3IiwiZW1haWwiOiJ2YXNhdi1sb3dlcmludC0zQHlvcG1haWwuY29tIiwiZmFtaWx5X25hbWUiOiJsb3dlcmludCIsInRva2VuX2lkIjoiTGd5NEhIa3hrQmlRQmp3VS1vV1JLMmhRVSIsInpvbmVpbmZvIjoiIiwibG9naW5faGludCI6InZhc2F2LWxvd2VyaW50LTNAeW9wbWFpbC5jb20iLCJub25jZSI6IiJ9.MWi0Up2wwns9zls51jrK4dEVQZc7CRjf_uCHWYzwwB0fzbJEd5oMypnMqcMZ2YsVT69ewIoGcgtRRLTpW6iEBS-pPqkOm7attT3EyIJt8D4v8Rxed_AxG7NU16i-tFjzRno3RztdXv0O9Fq4IzCgyBPLTmKARfGvZtv5nzwzod148RibC2_NClUm_7bzgwcx4oTBWDW5m6i5KbnQINrdkdiaTs2OwNDwOf0Cvpfq_rJ9erhr7RjCnWymy_s5qgLh9Z5LY8Ldw4IFaCXckcaQMYkr-2BlcX1G338QNBIx2FUXzkKKXPrpPdVd435lMFEJ_yuRYF4juBGhn6dpwVlEkw'
-            }
-
-            res = self.session.post('https://{0}/case-mgmt/v1/cases/threats'.format(self.base_url), json=data)
-
-            if res.ok:
-                caseId = str(res.json()['_links']['self']['href']).split('/')
-                return caseId[4]
-            else:
-                self.logger.error('Error in retrieving edr.get_case(). Error: {0} - {1}'
                                   .format(str(res.status_code), res.text))
                 exit()
 
@@ -261,6 +233,11 @@ class EDR():
             if res.ok:
                 self.logger.info('Successfully executed reaction for threatId {}'.format(tid))
                 self.logger.info(res.text)
+            elif res.status_code==429:
+                retry_interval=self.get_retryinterval(res)
+                self.logger.debug('Rate Limit Exceed in reaction Api, retrying after {} sec'.format(retry_interval))
+                time.sleep(int(retry_interval))
+                self.exec_reaction(processName,tid,hid)
             else:
                 self.logger.error('Error in retrieving edr.exec_reaction(). Error: {0} - {1}'
                                   .format(str(res.status_code), res.text))
@@ -287,8 +264,18 @@ class EDR():
 
         return data
 
+    def get_retryinterval(self,response):
+        self.logger.debug("\nResponse Header received:\n\n{}".format(response.headers))
+        retry_val = "0"
+        if 'Retry-After' in response.headers:
+            retry_val = response.headers["Retry-After"]
+            self.logger.debug('\nRetry interval set to {} secs. Sleeping...'.format(retry_val))
+        else:
+            self.logger.debug("\nRetry-after attribute is not present in response header..")
+        return retry_val
+
 if __name__ == '__main__':
-    usage = """python mvision_edr_threats.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -LL <LOG_LEVEL> """
+    usage = """python trellix_edr_threats.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -LL <LOG_LEVEL> """
     title = 'MVISION EDR Python API'
     parser = ArgumentParser(description=title, usage=usage, formatter_class=RawTextHelpFormatter)
 

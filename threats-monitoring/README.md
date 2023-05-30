@@ -126,3 +126,8 @@ Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_gener
    tail -f /opt/script/logs/mvedr_logger.log
    ```
    ![2](https://user-images.githubusercontent.com/25227268/173325628-7a044943-4df3-422e-a05e-764e3826c97e.png)
+
+
+   # setup syslog server:
+   1. https://www.keycdn.com/support/configure-syslog-server
+   2. you can check syslog logs at: /var/log/ folder
