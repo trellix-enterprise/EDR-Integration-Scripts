@@ -122,7 +122,7 @@ class EDR():
 
                 if res.ok:
                     res = res.json()
-                    if res['links']['next'] == None:
+                    if  'links' in res and res['links']['next'] == None:
                         tnextflag = False
                     else:
                         skip = skip+self.threatLimit
@@ -156,7 +156,7 @@ class EDR():
                                     threat['detection'] = detection
                                     logger.debug('our detection is {}'.format(detection))
                                     traceid = detection['traceId']
-                                    maguid = detection['host']['maGuid']
+                                    maguid = detection['host']['aGuid']
                                     sha256 = detection['sha256']
 
                                     threat['url'] = 'https://ui.{0}/monitoring/#/workspace/72,TOTAL_THREATS,{1}?traceId={2}&maGuid={3}&sha256={4}' \

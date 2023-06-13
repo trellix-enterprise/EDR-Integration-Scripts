@@ -23,7 +23,9 @@ Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_gener
    ```
    /opt/script/trellix_edr_threats.py
    ```
-
+   ```
+   chmod -R 777 /opt/script
+   ```
 
 2. Make sure the following dependencies are installed
 
@@ -36,7 +38,7 @@ Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_gener
 
    ```
    vim /opt/script/.env
-   ```
+   ```   
 
    Content:
    ```

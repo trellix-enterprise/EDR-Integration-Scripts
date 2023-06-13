@@ -289,7 +289,7 @@ if __name__ == '__main__':
                         help='MVISION EDR Client ID')
 
     parser.add_argument('--client_secret', '-S',
-                        required=False, type=str,
+                        required=True, type=str,
                         help='MVISION EDR Client Secret')
 
     parser.add_argument('--loglevel', '-LL',
