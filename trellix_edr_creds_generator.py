@@ -78,7 +78,7 @@ class EDR():
 
 
 if __name__ == '__main__':
-    usage = """python mvision_edr_creds_generator.py -T <REGISTRATION_TOKEN> -F <WRITE_FILE> -L <LOG_LEVEL>"""
+    usage = """python trellix_edr_creds_generator.py -T <REGISTRATION_TOKEN> -F <WRITE_FILE> -LL <LOG_LEVEL>"""
     title = 'MVISION EDR Python API'
     parser = ArgumentParser(description=title, usage=usage, formatter_class=RawTextHelpFormatter)
 
@@ -90,7 +90,7 @@ if __name__ == '__main__':
                         required=False, type=str, choices=['True', 'False'],
                         default='False', help='Option to write client creds to file.')
 
-    parser.add_argument('--loglevel', '-L',
+    parser.add_argument('--loglevel', '-LL',
                         required=False, type=str, choices=['INFO', 'DEBUG'],
                         default='INFO', help='Option to set log level.')
 

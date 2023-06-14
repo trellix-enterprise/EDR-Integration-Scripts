@@ -3,12 +3,12 @@
 This is a script to retrieve the action history from MVISION EDR. 
 
 The script requires tenant_region, client_id , client_secret and api key to pull the action history. 
-Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.trellix.com/trellix-products/EDR-Integration-Scripts/blob/develop/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-products/EDR-Integration-Scripts).
+Client_ID and Client_Secrets can get generated with the [trellix_edr_creds_generator.py](https://github.trellix.com/trellix-products/EDR-Integration-Scripts/blob/develop/trellix_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-products/EDR-Integration-Scripts).
 
 Usage: 
 
 ```sh
-usage: python mvision_edr_action_history.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -legacy <IS_LEGACY> -P <PROXY> -L <LIMIT> -L <LOG_LEVEL>
+usage: python trellix_edr_edr_action_history.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -legacy <IS_LEGACY> -P <PROXY> -L <LIMIT> -LL <LOG_LEVEL>
 
 MVISION EDR Python API
 
@@ -20,7 +20,7 @@ arguments:
                         MVISION EDR Client ID
   --client_secret CLIENT_SECRET, -S CLIENT_SECRET
                         MVISION EDR Client Secret
-  --x_api_key X_API_Key, -api_key X_API_KEY
+  --x_api_key X_API_Key, -K X_API_KEY
                         MVISION API Key
   --is_legacy IS_LEGACY, -legacy IS_LEGACY
                         For Old Format

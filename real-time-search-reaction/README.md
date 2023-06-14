@@ -3,11 +3,11 @@
 This is a collection of scripts to run Real-Time-Search and optional to execute reactions. 
 
 The script requires tenant_region, client_id and client_secret and api key to execute real-time searches. 
-Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.trellix.com/trellix-products/EDR-Integration-Scripts/blob/develop/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-products/EDR-Integration-Scripts).
+Client_ID and Client_Secrets can get generated with the [trellix_edr_creds_generator.py](https://github.trellix.com/trellix-products/EDR-Integration-Scripts/blob/develop/trellix_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-products/EDR-Integration-Scripts).
 
 Search Hash Usage:
 ```
-usage: Usage: python mvision_edr_search_hash.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -H <HASH>
+usage: Usage: python trellix_edr_search_hash.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -H <HASH>
 
 MVISION EDR Python API
 
@@ -19,12 +19,12 @@ arguments:
                         MVISION EDR Client ID
   --client_secret CLIENT_SECRET, -S CLIENT_SECRET
                         MVISION EDR Client Secret
-  --x_api_key X_API_Key, -api_key X_API_KEY
+  --x_api_key X_API_Key, -K X_API_KEY
                         MVISION API Key
   --hash HASH, -H HASH
   --reaction {True,False}, -RE {True,False}
                         Delete Files that got identified.
-  --loglevel {INFO,DEBUG}, -L {INFO,DEBUG}
+  --loglevel {INFO,DEBUG}, -LL {INFO,DEBUG}
                         Specify log level.
 
 ```
@@ -32,7 +32,7 @@ arguments:
 Search Process Usage:
 
 ```
-usage: Usage: python mvision_edr_search_process.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -PN <process name>
+usage: Usage: python trellix_edr_search_process.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -PN <process name>
 
 MVISION EDR Python API
 
@@ -44,12 +44,12 @@ arguments:
                         MVISION EDR Client ID
   --client_secret CLIENT_SECRET, -S CLIENT_SECRET
                         MVISION EDR Client Secret
-  --x_api_key X_API_Key, -api_key X_API_KEY
+  --x_api_key X_API_Key, -K X_API_KEY
                         MVISION API Key                        
   --process PROCESS, -PN PROCESS
   --reaction {True,False}, -RE {True,False}
                         Kill Process
-  --loglevel {INFO,DEBUG}, -L {INFO,DEBUG}
+  --loglevel {INFO,DEBUG}, -LL {INFO,DEBUG}
                         Specify log level
 
 ```
@@ -57,7 +57,7 @@ arguments:
 Search Filename Usage:
 
 ```
-usage: Usage: python mvision_edr_search_filename.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -F <FILE>
+usage: Usage: python trellix_edr_search_filename.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -F <FILE>
 
 MVISION EDR Python API
 
@@ -69,12 +69,12 @@ arguments:
                         MVISION EDR Client ID
   --client_secret CLIENT_SECRET, -S CLIENT_SECRET
                         MVISION EDR Client Secret
-  --x_api_key X_API_Key, -api_key X_API_KEY
+  --x_api_key X_API_Key, -K X_API_KEY
                         MVISION API Key
   --file FILE, -F FILE
   --reaction {True,False}, -RE {True,False}
                         Delete Files that got identified.
-  --loglevel {INFO,DEBUG}, -L {INFO,DEBUG}
+  --loglevel {INFO,DEBUG}, -LL {INFO,DEBUG}
                         Specify log level.
 
 ```
