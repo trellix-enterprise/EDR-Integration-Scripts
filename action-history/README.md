@@ -8,14 +8,14 @@ Client_ID and Client_Secrets can get generated with the [trellix_edr_creds_gener
 Usage: 
 
 ```sh
-usage: python trellix_edr_edr_action_history.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -legacy <IS_LEGACY> -P <PROXY> -L <LIMIT> -LL <LOG_LEVEL>
+usage: python trellix_edr_edr_action_history.py  -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -legacy <IS_LEGACY> -P <PROXY> -L <LIMIT> -LL <LOG_LEVEL>
 
 MVISION EDR Python API
 
 arguments:
   -h, --help            show this help message and exit
   --region {EU,US-W,US-E,SY,GOV}, -R {EU,US-W,US-E,SY,GOV}
-                        MVISION EDR Tenant Location
+                        [Depricated] MVISION EDR Tenant Location
   --client_id CLIENT_ID, -C CLIENT_ID
                         MVISION EDR Client ID
   --client_secret CLIENT_SECRET, -S CLIENT_SECRET
@@ -25,7 +25,7 @@ arguments:
   --is_legacy IS_LEGACY, -legacy IS_LEGACY
                         For Old Format
   --proxy {True,False}, -P {True,False}
-                        Provide Proxy JSON in line 35
+                        Provide Proxy JSON in line 25 in trellix_edr_action_history.py
   --limit LIMIT, -L LIMIT
                         Set the maximum number of events returned
   --loglevel {INFO,DEBUG}, -LL {INFO,DEBUG}

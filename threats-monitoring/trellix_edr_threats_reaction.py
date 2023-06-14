@@ -266,7 +266,7 @@ class EDR():
         return retry_val
 
 if __name__ == '__main__':
-    usage = """python trellix_edr_threats.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -LL <LOG_LEVEL> """
+    usage = """python trellix_edr_threats.py  -C <CLIENT_ID> -S <CLIENT_SECRET> -LL <LOG_LEVEL> """
     title = 'MVISION EDR Python API'
     parser = ArgumentParser(description=title, usage=usage, formatter_class=RawTextHelpFormatter)
 

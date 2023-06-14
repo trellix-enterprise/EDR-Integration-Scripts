@@ -7,14 +7,14 @@ Client_ID and Client_Secrets can get generated with the [trellix_edr_creds_gener
 
 Search Hash Usage:
 ```
-usage: Usage: python trellix_edr_search_hash.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -H <HASH>
+usage: Usage: python trellix_edr_search_hash.py -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -H <HASH>
 
 MVISION EDR Python API
 
 arguments:
   -h, --help            show this help message and exit
   --region {EU,US-W,US-E,SY,GOV}, -R {EU,US-W,US-E,SY,GOV}
-                        MVISION EDR Tenant Location
+                       [Depricated] MVISION EDR Tenant Location
   --client_id CLIENT_ID, -C CLIENT_ID
                         MVISION EDR Client ID
   --client_secret CLIENT_SECRET, -S CLIENT_SECRET
@@ -32,14 +32,14 @@ arguments:
 Search Process Usage:
 
 ```
-usage: Usage: python trellix_edr_search_process.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -PN <process name>
+usage: Usage: python trellix_edr_search_process.py  -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -PN <process name>
 
 MVISION EDR Python API
 
 arguments:
   -h, --help            show this help message and exit
   --region {EU,US-W,US-E,SY,GOV}, -R {EU,US-W,US-E,SY,GOV}
-                        MVISION EDR Tenant Location
+                        [Depricated]MVISION EDR Tenant Location
   --client_id CLIENT_ID, -C CLIENT_ID
                         MVISION EDR Client ID
   --client_secret CLIENT_SECRET, -S CLIENT_SECRET
@@ -57,14 +57,14 @@ arguments:
 Search Filename Usage:
 
 ```
-usage: Usage: python trellix_edr_search_filename.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -F <FILE>
+usage: Usage: python trellix_edr_search_filename.py  -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -F <FILE>
 
 MVISION EDR Python API
 
 arguments:
   -h, --help            show this help message and exit
   --region {EU,US-W,US-E,SY,GOV}, -R {EU,US-W,US-E,SY,GOV}
-                        MVISION EDR Tenant Location
+                        [Depricated]MVISION EDR Tenant Location
   --client_id CLIENT_ID, -C CLIENT_ID
                         MVISION EDR Client ID
   --client_secret CLIENT_SECRET, -S CLIENT_SECRET

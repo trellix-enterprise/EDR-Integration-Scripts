@@ -108,7 +108,7 @@ class EDR():
 
 
 if __name__ == '__main__':
-    usage = """python trellix_edr_action_history.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -legacy <IS_LEGACY> -P <PROXY> -L <LIMIT> -LL <LOG_LEVEL>"""
+    usage = """python trellix_edr_action_history.py -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -legacy <IS_LEGACY> -P <PROXY> -L <LIMIT> -LL <LOG_LEVEL>"""
     title = 'MVISION EDR Python API'
     parser = ArgumentParser(description=title, usage=usage,
                             formatter_class=RawTextHelpFormatter)
