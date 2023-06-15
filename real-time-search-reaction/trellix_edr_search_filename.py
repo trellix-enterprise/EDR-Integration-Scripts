@@ -82,7 +82,7 @@ class EDR():
                         }
                     }
 
-            res = self.session.post('https://{0}/searches/realtime'.format(self.base_url), json=payload)
+            res = self.session.post('https://{0}/edr/v2/searches/realtime'.format(self.base_url), json=payload)
 
             self.logger.debug('request url: {}'.format(res.url))
             self.logger.debug('request body: {}'.format(res.request.body))
@@ -105,7 +105,7 @@ class EDR():
     def search_status(self, queryId):
         try:
             status = False
-            res = self.session.get('https://{0}/searches/queue-jobs/{1}'.format(self.base_url, str(queryId)), allow_redirects=False)
+            res = self.session.get('https://{0}/edr/v2/searches/queue-jobs/{1}'.format(self.base_url, str(queryId)), allow_redirects=False)
 
             self.logger.debug('request url: {}'.format(res.url))
             self.logger.debug('request body: {}'.format(res.request.body))
@@ -123,7 +123,7 @@ class EDR():
 
     def search_result(self, queryId):
         try:
-            res = self.session.get('https://{0}/searches/realtime/{1}/results'.format(self.base_url, str(queryId)))
+            res = self.session.get('https://{0}/edr/v2/searches/realtime/{1}/results'.format(self.base_url, str(queryId)))
 
             self.logger.debug('request url: {}'.format(res.url))
             self.logger.debug('request body: {}'.format(res.request.body))
@@ -176,7 +176,7 @@ class EDR():
                 }
             }
 
-            res = self.session.post('https://{0}/remediation/search'.format(self.base_url),
+            res = self.session.post('https://{0}/edr/v2/remediation/search'.format(self.base_url),
                                     json=payload)
 
             self.logger.debug('request url: {}'.format(res.url))
