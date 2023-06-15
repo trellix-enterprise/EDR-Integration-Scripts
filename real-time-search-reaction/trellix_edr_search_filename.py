@@ -230,7 +230,7 @@ class EDR():
                                       line_no=exc_tb.tb_lineno, error=str(error)))
 
 if __name__ == '__main__':
-    usage = """Usage: python trellix_edr_search_filename.py -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -H <HASH>"""
+    usage = """Usage: python trellix_edr_search_filename.py -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -F <FILE>"""
     title = 'MVISION EDR Python API'
     parser = ArgumentParser(description=title, usage=usage, formatter_class=RawTextHelpFormatter)
 
