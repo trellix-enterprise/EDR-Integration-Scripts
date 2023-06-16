@@ -14,17 +14,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 class EDR():
     def __init__(self):
         self.iam_url = 'iam.mcafee-cloud.com/iam/v1.1'
-       
-        if args.region == 'EU':
-            self.base_url = 'soc.eu-central-1.trellix.com'
-        elif args.region == 'US-W':
-            self.base_url = 'soc.trellix.com'
-        elif args.region == 'US-E':
-            self.base_url = 'soc.us-east-1.trellix.com'
-        elif args.region == 'SY':
-            self.base_url = 'soc.ap-southeast-2.trellix.com'
-        elif args.region == 'GOV':
-            self.base_url = 'soc.mcafee-gov.com'
+        self.base_url='api.manage.trellix.com'
 
         self.logging()
 
@@ -107,7 +97,7 @@ class EDR():
             }
 
             res = self.session.post(
-                'https://{0}/searches/realtime'.format(self.base_url), json=payload)
+                'https://{0}/edr/v2/searches/realtime'.format(self.base_url), json=payload)
 
             self.logger.debug('request url: {}'.format(res.url))
             self.logger.debug('request body: {}'.format(res.request.body))
@@ -132,7 +122,7 @@ class EDR():
     def search_status(self, queryId):
         try:
             status = False
-            res = self.session.get('https://{0}/searches/queue-jobs/{1}'.format(
+            res = self.session.get('https://{0}/edr/v2/searches/queue-jobs/{1}'.format(
                 self.base_url, str(queryId)), allow_redirects=False)
 
             self.logger.debug('request url: {}'.format(res.url))
@@ -153,7 +143,7 @@ class EDR():
     def search_result(self, queryId):
         try:
             res = self.session.get(
-                'https://{0}/searches/realtime/{1}/results'.format(self.base_url, str(queryId)))
+                'https://{0}/edr/v2/searches/realtime/{1}/results'.format(self.base_url, str(queryId)))
 
             self.logger.debug('request url: {}'.format(res.url))
             self.logger.debug('request body: {}'.format(res.request.body))
@@ -209,7 +199,7 @@ class EDR():
                 }
             }
 
-            res = self.session.post('https://{0}/remediation/search'.format(self.base_url),
+            res = self.session.post('https://{0}/edr/v2/remediation/search'.format(self.base_url),
                                     json=payload)
 
             self.logger.debug('request url: {}'.format(res.url))
@@ -264,14 +254,14 @@ class EDR():
 
 
 if __name__ == '__main__':
-    usage = """Usage: python mvision_edr_search_hash.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -H <HASH>"""
+    usage = """Usage: python trellix_edr_search_hash.py -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -H <HASH>"""
     title = 'MVISION EDR Python API'
     parser = ArgumentParser(description=title, usage=usage,
                             formatter_class=RawTextHelpFormatter)
 
     parser.add_argument('--region', '-R',
-                        required=True, type=str,
-                        help='MVISION EDR Tenant Location', choices=['EU', 'US-W', 'US-E', 'SY', 'GOV'])
+                        required=False, type=str,
+                        help='[Deprecated] MVISION EDR Tenant Location', choices=['EU', 'US-W', 'US-E', 'SY', 'GOV'])
 
     parser.add_argument('--client_id', '-C',
                         required=True, type=str,
@@ -281,7 +271,7 @@ if __name__ == '__main__':
                         required=False, type=str,
                         help='MVISION EDR Client Secret')
 
-    parser.add_argument('--x_api_key', '-api_key',
+    parser.add_argument('--x_api_key', '-K',
                         required=True, type=str,
                         help='MVISION API Key')
 
@@ -292,7 +282,7 @@ if __name__ == '__main__':
                         type=str, choices=['True', 'False'],
                         default='False', help='Delete Files that got identified.')
 
-    parser.add_argument('--loglevel', '-L', required=False,
+    parser.add_argument('--loglevel', '-LL', required=False,
                         type=str, choices=['INFO', 'DEBUG'],
                         default='INFO', help='Specify log level.')
 

@@ -19,16 +19,7 @@ from logging.handlers import SysLogHandler
 class EDR():
     def __init__(self):
         self.iam_url = 'iam.mcafee-cloud.com/iam/v1.1'
-        if args.region == 'EU':
-            self.base_url = 'soc.eu-central-1.mcafee.com'
-        elif args.region == 'US-W':
-            self.base_url = 'soc.mcafee.com'
-        elif args.region == 'US-E':
-            self.base_url = 'soc.us-east-1.mcafee.com'
-        elif args.region == 'SY':
-            self.base_url = 'soc.ap-southeast-2.mcafee.com'
-        elif args.region == 'GOV':
-            self.base_url = 'soc.mcafee-gov.com'
+        self.base_url='api.manage.trellix.com'
 
         self.logging()
 
@@ -275,13 +266,13 @@ class EDR():
         return retry_val
 
 if __name__ == '__main__':
-    usage = """python trellix_edr_threats.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -LL <LOG_LEVEL> """
+    usage = """python trellix_edr_threats.py  -C <CLIENT_ID> -S <CLIENT_SECRET> -LL <LOG_LEVEL> -K <X_API_KEY>"""
     title = 'MVISION EDR Python API'
     parser = ArgumentParser(description=title, usage=usage, formatter_class=RawTextHelpFormatter)
 
     parser.add_argument('--region', '-R',
-                        required=True, type=str,
-                        help='MVISION EDR Tenant Location', choices=['EU', 'US-W', 'US-E', 'SY', 'GOV']
+                        required=False, type=str,
+                        help='[Deprecated] MVISION EDR Tenant Location', choices=['EU', 'US-W', 'US-E', 'SY', 'GOV']
                         )
 
     parser.add_argument('--client_id', '-C',
@@ -289,7 +280,7 @@ if __name__ == '__main__':
                         help='MVISION EDR Client ID')
 
     parser.add_argument('--client_secret', '-S',
-                        required=False, type=str,
+                        required=True, type=str,
                         help='MVISION EDR Client Secret')
 
     parser.add_argument('--loglevel', '-LL',

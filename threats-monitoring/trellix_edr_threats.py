@@ -23,15 +23,20 @@ class EDR():
     def __init__(self):
         self.iam_url = 'iam.mcafee-cloud.com/iam/v1.1'
         if edr_region == 'EU':
-            self.base_url = 'soc.eu-central-1.trellix.com'
+            self.base_url_ui = 'soc.eu-central-1.trellix.com'
         elif edr_region == 'US-W':
-            self.base_url = 'soc.trellix.com'
+            self.base_url_ui = 'soc.trellix.com'
         elif edr_region == 'US-E':
-            self.base_url = 'soc.us-east-1.trellix.com'
+            self.base_url_ui = 'soc.us-east-1.trellix.com'
         elif edr_region == 'SY':
-            self.base_url = 'soc.ap-southeast-2.trellix.com'
+            self.base_url_ui = 'soc.ap-southeast-2.trellix.com'
         elif edr_region == 'GOV':
-            self.base_url = 'soc.mcafee-gov.com'
+            self.base_url_ui = 'soc.mcafee-gov.com'
+        else:
+             logger.error("EDR_REGION is mandatory in .env file, valid values are 'EU', 'US-W', 'US-E', 'SY', 'GOV'")
+             sys.exit()
+            
+        self.base_url='api.manage.trellix.com'
 
         self.session = requests.Session()
 
@@ -122,7 +127,7 @@ class EDR():
 
                 if res.ok:
                     res = res.json()
-                    if res['links']['next'] == None:
+                    if  'links' in res and res['links']['next'] == None:
                         tnextflag = False
                     else:
                         skip = skip+self.threatLimit
@@ -156,11 +161,11 @@ class EDR():
                                     threat['detection'] = detection
                                     logger.debug('our detection is {}'.format(detection))
                                     traceid = detection['traceId']
-                                    maguid = detection['host']['maGuid']
+                                    maguid = detection['host']['aGuid']
                                     sha256 = detection['sha256']
 
                                     threat['url'] = 'https://ui.{0}/monitoring/#/workspace/72,TOTAL_THREATS,{1}?traceId={2}&maGuid={3}&sha256={4}' \
-                                        .format(self.base_url, threat['id'], traceid, maguid, sha256)
+                                        .format(self.base_url_ui, threat['id'], traceid, maguid, sha256)
                                     logger.debug(json.dumps(threat))
                                     logger.info('Retrieved new MVISION EDR Threat Detection. {0}'.format(threat['name']))
 

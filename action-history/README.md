@@ -2,30 +2,30 @@
 
 This is a script to retrieve the action history from MVISION EDR. 
 
-The script requires tenant_region, client_id , client_secret and api key to pull the action history. 
-Client_ID and Client_Secrets can get generated with the [mvision_edr_creds_generator.py](https://github.trellix.com/trellix-products/EDR-Integration-Scripts/blob/develop/mvision_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-products/EDR-Integration-Scripts).
+The script requires  client_id , client_secret and api key to pull the action history. 
+Client_ID and Client_Secrets can get generated with the [trellix_edr_creds_generator.py](https://github.trellix.com/trellix-products/EDR-Integration-Scripts/blob/develop/trellix_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-products/EDR-Integration-Scripts).
 
 Usage: 
 
 ```sh
-usage: python mvision_edr_action_history.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -legacy <IS_LEGACY> -P <PROXY> -L <LIMIT> -L <LOG_LEVEL>
+usage: python trellix_edr_action_history.py  -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -legacy <IS_LEGACY> -P <PROXY> -L <LIMIT> -LL <LOG_LEVEL>
 
 MVISION EDR Python API
 
 arguments:
   -h, --help            show this help message and exit
   --region {EU,US-W,US-E,SY,GOV}, -R {EU,US-W,US-E,SY,GOV}
-                        MVISION EDR Tenant Location
+                        [Depricated] MVISION EDR Tenant Location
   --client_id CLIENT_ID, -C CLIENT_ID
                         MVISION EDR Client ID
   --client_secret CLIENT_SECRET, -S CLIENT_SECRET
                         MVISION EDR Client Secret
-  --x_api_key X_API_Key, -api_key X_API_KEY
+  --x_api_key X_API_Key, -K X_API_KEY
                         MVISION API Key
   --is_legacy IS_LEGACY, -legacy IS_LEGACY
                         For Old Format
   --proxy {True,False}, -P {True,False}
-                        Provide Proxy JSON in line 35
+                        Provide Proxy JSON in line 25 in trellix_edr_action_history.py
   --limit LIMIT, -L LIMIT
                         Set the maximum number of events returned
   --loglevel {INFO,DEBUG}, -LL {INFO,DEBUG}

@@ -9,27 +9,16 @@ import logging
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 
-import mvision_action_history_legacy
+import trellix_edr_action_history_legacy
 
 
 class EDR():
     def __init__(self):
 
         self.iam_url = 'iam.mcafee-cloud.com/iam/v1.1'
-       
-        if args.region == 'EU':
-            self.base_url = 'soc.eu-central-1.trellix.com'
-        elif args.region == 'US-W':
-            self.base_url = 'soc.trellix.com'
-        elif args.region == 'US-E':
-            self.base_url = 'soc.us-east-1.trellix.com'
-        elif args.region == 'SY':
-            self.base_url = 'soc.ap-southeast-2.trellix.com'
-        elif args.region == 'GOV':
-            self.base_url = 'soc.mcafee-gov.com'
-
+        self.base_url='api.manage.trellix.com'
         self.logging()
-
+        
         self.session = requests.Session()
         self.session.verify = True
 
@@ -93,7 +82,7 @@ class EDR():
 
     def action_history(self):
         try:
-            res = self.session.get('https://{0}/remediation/actions?page[limit]={1}'
+            res = self.session.get('https://{0}/edr/v2/remediation/actions?page[limit]={1}'
                                    .format(self.base_url, str(self.limit)))
 
             self.logger.debug('request url: {}'.format(res.url))
@@ -102,7 +91,7 @@ class EDR():
                 self.logger.info(
                     'SUCCESS: Successful retrieved action history')
                 if (args.is_legacy == 'True'):
-                    mvision_action_history_legacy.action_history_legacy(
+                    trellix_edr_action_history_legacy.action_history_legacy(
                         self.logger, res.json(), self.limit)
                 else:
                     self.logger.info(json.dumps(res.json()))
@@ -119,14 +108,14 @@ class EDR():
 
 
 if __name__ == '__main__':
-    usage = """python mvision_edr_action_history.py -R <REGION> -C <CLIENT_ID> -S <CLIENT_SECRET> -api_key <X_API_KEY> -legacy <IS_LEGACY> -P <PROXY> -L <LIMIT> -L <LOG_LEVEL>"""
+    usage = """python trellix_edr_action_history.py -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -legacy <IS_LEGACY> -P <PROXY> -L <LIMIT> -LL <LOG_LEVEL>"""
     title = 'MVISION EDR Python API'
     parser = ArgumentParser(description=title, usage=usage,
                             formatter_class=RawTextHelpFormatter)
 
     parser.add_argument('--region', '-R',
-                        required=True, type=str,
-                        help='MVISION EDR Tenant Location', choices=['EU', 'US-W', 'US-E', 'SY', 'GOV'])
+                        required=False, type=str,
+                        help='[Deprecated] MVISION EDR Tenant Location', choices=['EU', 'US-W', 'US-E', 'SY', 'GOV'])
 
     parser.add_argument('--client_id', '-C',
                         required=True, type=str,
@@ -136,7 +125,7 @@ if __name__ == '__main__':
                         required=False, type=str,
                         help='MVISION EDR Client Secret')
 
-    parser.add_argument('--x_api_key', '-api_key',
+    parser.add_argument('--x_api_key', '-K',
                         required=True, type=str,
                         help='MVISION API Key')
 
