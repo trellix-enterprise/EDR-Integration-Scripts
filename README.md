@@ -14,7 +14,8 @@ To authenticate against the MVISION EDR API, client credentials need to be gener
 5. Enter number of clients (1)
 
 
-   ![2](https://user-images.githubusercontent.com/25227268/165046797-2a913460-9f84-480e-a3a5-a9c358467e32.png)
+   ![2](https://github.trellix.com/storage/user/3896/files/9695f58c-8729-48ed-aef0-dee2d4c43387)
+
 6. Click on the "Save" button
 7. Copy the "Token" value from the table under the section "MVISION Endpoint Detection and Response"
 
