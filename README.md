@@ -10,9 +10,11 @@ To authenticate against the MVISION EDR API, client credentials need to be gener
 2. Go to "Appliance and Server Registration" page from the menu
 
    ![1](https://user-images.githubusercontent.com/25227268/165046594-7af12d3c-a6fd-43fc-b88f-0381b08b1b9c.png)
+   ![MicrosoftTeams-image (5)](https://github.trellix.com/storage/user/3896/files/ba51cdf8-b73d-4ca3-99b0-95d15e8affb7)
 3. Click on "Add" button
 4. Choose client type "MVISION Endpoint Detection and Response"
 5. Enter number of clients (1)
+
 
    ![2](https://user-images.githubusercontent.com/25227268/165046797-2a913460-9f84-480e-a3a5-a9c358467e32.png)
 6. Click on the "Save" button
