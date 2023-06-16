@@ -21,7 +21,7 @@ To authenticate against the MVISION EDR API, client credentials need to be gener
 
    ![3](https://github.trellix.com/storage/user/3896/files/36c5b6c2-231f-49a8-a8db-b88a5c97e0f2)
 
-8. Pass the token value as the input parameter to the [mvision_edr_creds_generator.py](mvision_edr_creds_generator.py) script
+8. Pass the token value as the input parameter to the [trellix_edr_creds_generator.py](trellix_edr_creds_generator.py) script
 9. The script will generate the client_id, client_secret and print on the output console / writes the output to a file (optional)
 10. Use the client_id, client_secret for authentication against the MVISION EDR API
 
