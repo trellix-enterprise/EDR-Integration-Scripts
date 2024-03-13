@@ -192,6 +192,7 @@ class EDR():
 
                     else:
                         logger.debug('No new threats identified. Exiting. {0}'.format(res))
+                        tnextflag = False # line added to allow loop to finish successfully and cause loop to immediately repeat and bypass the retry interval.
                 elif res.status_code==429:
                      retry_interval=self.get_retryinterval(res)
                      logger.debug('Rate Limit Exceed in Threats Api, retrying after  {} sec'.format(retry_interval))
