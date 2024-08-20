@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# Written by mohlcyber v.1.7 (13.06.2022)
-# Updated by Trellix v.1.8 (15.2.2013)
-# Script to retrieve all threats from the monitoring dashboard
+# Updated by Trellix (2024)
+# Script to retrieve all threats
 
 import sys
 import requests
@@ -18,10 +17,11 @@ from dotenv import load_dotenv
 
 load_dotenv(verbose=True)
 
+total_api_counts=0
 
 class EDR():
     def __init__(self):
-        self.iam_url = 'iam.mcafee-cloud.com/iam/v1.1'
+        self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
         if edr_region == 'EU':
             self.base_url_ui = 'soc.eu-central-1.trellix.com'
         elif edr_region == 'US-W':
@@ -72,13 +72,14 @@ class EDR():
         self.threatLimit = 10000
         self.affectedHostLimit=5000
         self.detectionsLimit=5000
+        global total_api_counts
+        total_api_counts=0
 
     def auth(self, creds):
         try:
             payload = {
                 'scope': 'soc.hts.c soc.hts.r soc.rts.c soc.rts.r soc.qry.pr soc.act.tg',
-                'grant_type': 'client_credentials',
-                'audience': 'mcafee'
+                'grant_type': 'client_credentials'
             }
 
             headers = {
@@ -106,8 +107,10 @@ class EDR():
 
     def get_threats(self):
         try:
-            tthreat = 0
-            tdetect = 0
+            global total_api_counts
+            total_threats_count = 0
+            total_detections_count = 0
+            total_affected_hosts_count=0
             skip = 0
             tnextflag = True
 
@@ -126,6 +129,8 @@ class EDR():
                         .format(self.base_url, json.dumps(filter), self.epoch_pull, self.threatLimit, skip),headers=headers)
 
                 if res.ok:
+                    total_api_counts+=1
+                    logger.debug("processing threats API response")
                     res = res.json()
                     if  'links' in res and res['links']['next'] == None:
                         tnextflag = False
@@ -150,17 +155,19 @@ class EDR():
                             cache.close()
 
                         for threat in res['data']:
-                            threat=self.mvision_to_martin_formatter(threat)
+                            threat=self.mvision_to_old_format(threat)
+                            logger.debug("fetched threat id {0}".format(threat['id']))
                             affhosts = self.get_affected_hosts(threat['id'])
-                            ddetect_count = 0
+                            threat_detections_count = 0
                             for host in affhosts:
+                                logger.debug("fetched affected host id {0}".format(host['id']))
                                 detections = self.get_detections(threat['id'], host['id'])
-
                                 for detection in detections:
-                                    detection=self.mvision_to_martin_formatter(detection)
+                                    detection=self.mvision_to_old_format(detection)
                                     threat['detection'] = detection
                                     logger.debug('our detection is {}'.format(detection))
                                     traceid = detection['traceId']
+                                    logger.debug("fetched detection trace id {0}".format(traceid))
                                     maguid = detection['host']['aGuid']
                                     sha256 = detection['sha256']
 
@@ -183,13 +190,12 @@ class EDR():
                                         file = open('{}/{}'.format(threat_dir, filename), 'w')
                                         file.write(json.dumps(threat))
                                         file.close()
-
-                                    tdetect += 1
-                                    ddetect_count += 1
-
-                            logger.debug('For threat {0} identified {1} new detections.'.format(threat['name'], ddetect_count))
-                            tthreat += 1
-
+                                        threat_detections_count += 1
+                                        total_detections_count+=1
+                                total_affected_hosts_count += 1
+                            total_threats_count += 1            
+                            logger.debug('For threat {0} identified {1} new detections.'.format(threat['name'], threat_detections_count))
+                            
                     else:
                         logger.debug('No new threats identified. Exiting. {0}'.format(res))
                 elif res.status_code==429:
@@ -202,7 +208,7 @@ class EDR():
                     logger.error('Error in retrieving edr.get_threats(). Request body: {}'.format(res.request.body))
                     raise Exception('Error in retrieving edr.get_threats(). Error: {0} - {1}'.format(str(res.status_code), res.text))
 
-            logger.debug('Pulled total {0} Threats and {1} Detections.'.format(tthreat, tdetect))
+            logger.debug('Pulled total {0} Threats {1} AffectedHosts and {2} Detections.'.format(total_threats_count,total_affected_hosts_count, total_detections_count))
 
         except Exception as error:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -213,6 +219,7 @@ class EDR():
 
     def get_affected_hosts(self, threatId):
         try:
+            global total_api_counts
             skip = 0
             anextflag = True
             affhosts = []
@@ -222,12 +229,13 @@ class EDR():
                 }
 
             while(anextflag):
-
                 res = self.session.get(
                     'https://{0}/edr/v2/threats/{1}/affectedhosts?from={2}&page[limit]={3}&page[offset]={4}'
                         .format(self.base_url, threatId, self.epoch_pull, self.affectedHostLimit, skip),headers=headers)
                 
                 if res.ok:
+                    total_api_counts+=1
+                    logger.debug("processing affectedHosts API response")
                     res = res.json()
                     if res['links']['next'] == None:
                         anextflag = False
@@ -262,6 +270,7 @@ class EDR():
 
     def get_detections(self, threatId, affhost):
         try:
+            global total_api_counts
             skip = 0
             dnextflag = True
             detections = []
@@ -274,12 +283,13 @@ class EDR():
                 filter = {
                     'affectedHostId': affhost
                 }
-
                 res = self.session.get(
                     'https://{0}/edr/v2/threats/{1}/detections?from={2}&filter={3}&page[limit]={4}&page[offset]={5}'
                         .format(self.base_url, threatId, self.epoch_pull, json.dumps(filter), self.detectionsLimit, skip),headers=headers)
 
                 if res.ok:
+                    total_api_counts+=1
+                    logger.debug("processing detections API response")
                     res = res.json()
                     if res['links']['next'] == None:
                         dnextflag = False
@@ -311,7 +321,7 @@ class EDR():
                                  line_no=exc_tb.tb_lineno, error=str(error)))
             raise
 
-    def mvision_to_martin_formatter(self,source):
+    def mvision_to_old_format(self,source):
         data = {}
         dict=json.loads(json.dumps(source))
         for x in dict:
@@ -328,7 +338,7 @@ class EDR():
     
     def get_retryinterval(self,response):
         logger.debug("\nResponse Header received:\n\n{}".format(response.headers))
-        retry_val = "0"
+        retry_val = "300"
         if 'Retry-After' in response.headers:
             retry_val = response.headers["Retry-After"]
             logger.debug('\nRetry interval set to {} secs. Sleeping...'.format(retry_val))
@@ -388,6 +398,8 @@ if __name__ == '__main__':
             edr = EDR()
             edr.get_threats()
             edr.session.close()
+            logger.log('total API resource count {} '.format(total_api_counts))
             time.sleep(int(interval))
         except Exception:
+            logger.error('total API resource count in exception {} '.format(total_api_counts))
             time.sleep(60)
