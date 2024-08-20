@@ -2,6 +2,9 @@
 
 This is a collection of different TRELLIX EDR integration scripts. 
 
+These scripts are intended to be a guideline and not supported by Trellix , if you help integrating scripts with EDR reach out to Trellix Professional services
+
+
 ## Client Credential Generator
 
 To authenticate against the TRELLIX EDR API, client credentials need to be generated with the [TRELLIX EDR Credential Generator](trellix_edr_creds_generator.py) first.

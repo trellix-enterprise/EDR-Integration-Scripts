@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Updated  by Trellix (2024)
 # Script to retrieve all threats and stop the related process
+# This is a script intended to be a guideline and not supported by Trellix , if you help integrating scripts with EDR reach out to Trellix Professional services
 
 import sys
 import getpass

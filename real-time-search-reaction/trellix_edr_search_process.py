@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # based on a hash, script will automatically launch MVISION EDR query
+# This is a script intended to be a guideline and not supported by Trellix , if you help integrating scripts with EDR reach out to Trellix Professional services
 
 import sys
 import getpass
