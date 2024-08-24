@@ -156,18 +156,17 @@ class EDR():
 
                         for threat in res['data']:
                             threat=self.mvision_to_old_format(threat)
-                            logger.debug("fetched threat id {0}".format(threat['id']))
+                            logger.debug("pulled threat id {0}".format(threat['id']))
                             affhosts = self.get_affected_hosts(threat['id'])
                             threat_detections_count = 0
                             for host in affhosts:
-                                logger.debug("fetched affected host id {0}".format(host['id']))
+                                logger.debug("pulled affected host id {0} for threat {1}".format(host['id'], threat['id']))
                                 detections = self.get_detections(threat['id'], host['id'])
                                 for detection in detections:
                                     detection=self.mvision_to_old_format(detection)
                                     threat['detection'] = detection
-                                    logger.debug('our detection is {}'.format(detection))
                                     traceid = detection['traceId']
-                                    logger.debug("fetched detection trace id {0}".format(traceid))
+                                    logger.debug("pulled detection for trace id {0} , affected Host id {1} , threat id {2} and threat last detection date {3}".format(traceid, host['id'], threat['id'], threat['lastDetected']))
                                     maguid = detection['host']['aGuid']
                                     sha256 = detection['sha256']
 
