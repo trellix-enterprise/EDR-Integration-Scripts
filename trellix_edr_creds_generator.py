@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Written by mohlcyber v.1.0 (25.04.2022)
 # Script to generate client credentials for use in api calls
 # This needs to be called only once.
 # The generated client credentials must be safely stored for use in api calls
@@ -26,7 +25,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 class EDR():
     def __init__(self):
-        self.base_url = 'iam.mcafee-cloud.com/iam/v1.1'
+        self.base_url = 'iam.cloud.trellix.com/iam/v1.0'
         self.verify = True
         self.logging()
 

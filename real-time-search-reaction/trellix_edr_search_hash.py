@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # based on a hash, script will automatically launch MVISION EDR query
+# This is a script intended to be a guideline and not supported by Trellix , if you help integrating scripts with EDR reach out to Trellix Professional services
+
 
 import sys
 import getpass
@@ -13,7 +15,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 
 class EDR():
     def __init__(self):
-        self.iam_url = 'iam.mcafee-cloud.com/iam/v1.1'
+        self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
         self.base_url='api.manage.trellix.com'
 
         self.logging()
@@ -39,8 +41,7 @@ class EDR():
 
             payload = {
                 'scope': 'mi.user.investigate soc.act.tg soc.hts.c soc.hts.r soc.rts.c soc.rts.r soc.qry.pr',
-                'grant_type': 'client_credentials',
-                'audience': 'mcafee'
+                'grant_type': 'client_credentials'
             }
 
             headers = {

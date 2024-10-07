@@ -1,3 +1,5 @@
+# This is a script intended to be a guideline and not supported by Trellix , if you help integrating scripts with EDR reach out to Trellix Professional services
+
 import json
 
 

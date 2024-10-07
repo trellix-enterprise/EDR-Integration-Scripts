@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# Written by mohlcyber v.1.0 (25.04.2022)
-# Updated  by Trellix v.1.0 (15.02.2023)
-# Script to retrieve all threats from the monitoring dashboard and stop the related process
+# Script to retrieve all threats and stop the related process
+# This is a script intended to be a guideline and not supported by Trellix , if you help integrating scripts with EDR reach out to Trellix Professional services
 
 import sys
 import getpass
@@ -18,7 +17,7 @@ from logging.handlers import SysLogHandler
 
 class EDR():
     def __init__(self):
-        self.iam_url = 'iam.mcafee-cloud.com/iam/v1.1'
+        self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
         self.base_url='api.manage.trellix.com'
 
         self.logging()
@@ -64,8 +63,7 @@ class EDR():
         try:
             payload = {
                 'scope': 'mi.user.investigate soc.act.tg soc.hts.c soc.hts.r soc.rts.c soc.rts.r soc.qry.pr soc.internal',
-                'grant_type': 'client_credentials',
-                'audience': 'mcafee'
+                'grant_type': 'client_credentials'
             }
 
             headers = {
@@ -119,13 +117,13 @@ class EDR():
                     cache.close()
 
                     for threat in res['data']:
-                        threat = self.mvision_to_martin_formatter(threat)
+                        threat = self.mvision_to_old_format(threat)
                         detections = self.get_detections(threat['id'])
                         threat['url'] = 'https://ui.' + self.base_url + '/monitoring/#/workspace/72,TOTAL_THREATS,{0}'\
                             .format(threat['id'])
 
                         for detection in detections:
-                            threat['detection'] = self.mvision_to_martin_formatter(detection)
+                            threat['detection'] = self.mvision_to_old_format(detection)
 
                         pname = threat['name']
                         tid = threat['id']
@@ -240,7 +238,7 @@ class EDR():
                               .format(location=__name__, funct_name=sys._getframe().f_code.co_name,
                                       line_no=exc_tb.tb_lineno, error=str(error)))
 
-    def mvision_to_martin_formatter(self,source):
+    def mvision_to_old_format(self,source):
         data = {}
         dict=json.loads(json.dumps(source))
         for x in dict:
