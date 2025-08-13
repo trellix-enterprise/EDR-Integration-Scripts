@@ -17,7 +17,11 @@ from logging.handlers import SysLogHandler
 
 class EDR():
     def __init__(self):
-        self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
+        # Support for multiple IAM issuers (default to 'auth')
+        if iam_issuer and iam_issuer.lower() == 'cloud':
+            self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
+        else:
+            self.iam_url = 'auth.trellix.com/auth/realms/IAM/protocol/openid-connect'
         self.base_url='api.manage.trellix.com'
 
         self.logging()
@@ -67,7 +71,7 @@ class EDR():
             }
 
             headers = {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
 
             res = self.session.post('https://{0}/token'.format(self.iam_url), data=payload, auth=creds,headers=headers)
@@ -202,35 +206,46 @@ class EDR():
                               .format(location=__name__, funct_name=sys._getframe().f_code.co_name,
                                       line_no=exc_tb.tb_lineno, error=str(error)))
 
-    def exec_reaction(self, processName, tid, hid):
+    def exec_reaction(self, pname, tid, hid):
         try:
-            data = {
-                'data':{
-                    'type': 'threatRemediation',
-                    'attributes': {
-                        'action': 'StopProcess', # options [StopProcess, StopAndRemove, QuarantineHost, UnquarantineHost]
-                        'threatId': str(tid),
-                        'processName': processName,
-                        'affectedHostIds': [str(hid)]
+            payload = {
+                "data": {
+                    "type": "remediation",
+                    "attributes": {
+                        "action": "killProcess",
+                        "tmsId": str(tid),
+                        "actionInputs": [
+                            {
+                                "name": "pname",
+                                "value": str(pname)
+                            }
+                        ]
+                    },
+                    "relationships": {
+                        "hosts": {
+                            "data": [
+                                {
+                                    "type": "host",
+                                    "id": str(hid)
+                                }
+                            ]
+                        }
                     }
                 }
             }
 
-            res = self.session.post('https://{0}/edr/v2/remediation/threat'.format(self.base_url),
-                                    data=json.dumps(data))
+            res = self.session.post('https://{0}/edr/v2/remediation'.format(self.base_url), json=payload)
+
+            self.logger.debug('request url: {}'.format(res.url))
+            self.logger.debug('request headers: {}'.format(res.request.headers))
+            self.logger.debug('request body: {}'.format(res.request.body))
 
             if res.ok:
-                self.logger.info('Successfully executed reaction for threatId {}'.format(tid))
-                self.logger.info(res.text)
-            elif res.status_code==429:
-                retry_interval=self.get_retryinterval(res)
-                self.logger.debug('Rate Limit Exceed in reaction Api, retrying after {} sec'.format(retry_interval))
-                time.sleep(int(retry_interval))
-                self.exec_reaction(processName,tid,hid)
+                return res.json()['data']['id']
             else:
-                self.logger.error('Error in retrieving edr.exec_reaction(). Error: {0} - {1}'
+                self.logger.error('Error in edr.exec_reaction(). Error: {0} - {1}'
                                   .format(str(res.status_code), res.text))
-                #sys.exit()
+                exit()
 
         except Exception as error:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -240,57 +255,52 @@ class EDR():
 
     def mvision_to_old_format(self,source):
         data = {}
-        dict=json.loads(json.dumps(source))
-        for x in dict:
+        json_data=json.loads(json.dumps(source))
+        for x in json_data:
             if(x=='type'):
                 continue
             if(x=='attributes'):
-                nested_dict=json.loads(json.dumps(dict[x]))
-                for y in nested_dict:
-                    data[y]=nested_dict[y]
+                nested_json=json.loads(json.dumps(json_data[x]))
+                for y in nested_json:
+                    data[y]=nested_json[y]
             else:
-                data[x]=dict[x]
+                data[x]=json_data[x]
 
         return data
 
-    def get_retryinterval(self,response):
-        self.logger.debug("\nResponse Header received:\n\n{}".format(response.headers))
-        retry_val = "0"
-        if 'Retry-After' in response.headers:
-            retry_val = response.headers["Retry-After"]
-            self.logger.debug('\nRetry interval set to {} secs. Sleeping...'.format(retry_val))
-        else:
-            self.logger.debug("\nRetry-after attribute is not present in response header..")
-        return retry_val
 
 if __name__ == '__main__':
-    usage = """python trellix_edr_threats.py  -C <CLIENT_ID> -S <CLIENT_SECRET> -LL <LOG_LEVEL> -K <X_API_KEY>"""
+    usage = """python trellix_edr_threats_reaction.py -C <CLIENT_ID> -S <CLIENT_SECRET> -K <X_API_KEY> -RE <REACTION> -LL <LOG_LEVEL> -P <PROXY>"""
     title = 'MVISION EDR Python API'
-    parser = ArgumentParser(description=title, usage=usage, formatter_class=RawTextHelpFormatter)
-
-    parser.add_argument('--region', '-R',
-                        required=False, type=str,
-                        help='[Deprecated] MVISION EDR Tenant Location', choices=['EU', 'US-W', 'US-E', 'SY', 'GOV']
-                        )
+    parser = ArgumentParser(description=title, usage=usage,
+                            formatter_class=RawTextHelpFormatter)
 
     parser.add_argument('--client_id', '-C',
                         required=True, type=str,
                         help='MVISION EDR Client ID')
 
     parser.add_argument('--client_secret', '-S',
-                        required=True, type=str,
+                        required=False, type=str,
                         help='MVISION EDR Client Secret')
+
+    parser.add_argument('--x_api_key', '-K',
+                        required=True, type=str,
+                        help='MVISION API Key')
+
+    parser.add_argument('--reaction', '-RE',
+                        required=False, type=str, choices=['True', 'False'], default='False',
+                        help='Kill Process')
 
     parser.add_argument('--loglevel', '-LL',
                         required=False, type=str, choices=['INFO', 'DEBUG'], default='INFO',
                         help='Set Log Level')
-    parser.add_argument('--x_api_key', '-K',
-                        required=True, type=str,
-                        help='MVISION EDR API KEY')
-    args = parser.parse_args()
-    print(args)
-    if not args.client_secret:
-        args.client_secret = getpass.getpass(prompt='MVISION EDR Client Secret: ')
 
-    edr = EDR()
-    edr.get_threats()
+    args = parser.parse_args()
+    if not args.client_secret:
+        args.client_secret = getpass.getpass(
+            prompt='MVISION EDR Client Secret: ')
+
+    # Read IAM issuer from environment (IAM_ISSUER). Accepts 'cloud' or 'auth'. Default: 'auth'
+    iam_issuer = os.getenv('IAM_ISSUER', 'auth')
+
+    EDR().get_threats()

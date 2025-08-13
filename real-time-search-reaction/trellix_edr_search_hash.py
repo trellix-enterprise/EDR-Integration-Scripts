@@ -9,13 +9,18 @@ import time
 import requests
 import logging
 import json
+import os
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 
 class EDR():
     def __init__(self):
-        self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
+        # Support for multiple IAM issuers (default to 'auth')
+        if iam_issuer and iam_issuer.lower() == 'cloud':
+            self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
+        else:
+            self.iam_url = 'auth.trellix.com/auth/realms/IAM/protocol/openid-connect'
         self.base_url='api.manage.trellix.com'
 
         self.logging()
@@ -291,5 +296,8 @@ if __name__ == '__main__':
     if not args.client_secret:
         args.client_secret = getpass.getpass(
             prompt='MVISION EDR Client Secret: ')
+
+    # Read IAM issuer from environment (IAM_ISSUER). Accepts 'cloud' or 'auth'. Default: 'auth'
+    iam_issuer = os.getenv('IAM_ISSUER', 'auth')
 
     EDR().main()

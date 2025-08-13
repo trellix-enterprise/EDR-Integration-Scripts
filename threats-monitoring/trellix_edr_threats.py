@@ -26,7 +26,11 @@ date_pattern = '%Y-%m-%dT%H:%M:%SZ'
 class EDR():
     
     def __init__(self):
-        self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
+        # Support for multiple IAM issuers (default to 'auth')
+        if iam_issuer and iam_issuer.lower() == 'cloud':
+            self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
+        else:
+            self.iam_url = 'auth.trellix.com/auth/realms/IAM/protocol/openid-connect'
         if edr_region == 'EU':
             self.base_url_ui = 'soc.eu-central-1.trellix.com'
         elif edr_region == 'US-W':
@@ -372,6 +376,8 @@ if __name__ == '__main__':
     threat_log = os.getenv('THREAT_LOG')
     threat_dir = os.getenv('THREAT_DIR')
     x_api_key=os.getenv('X_API_KEY')
+    # New env to pick IAM issuer ('cloud' for iam.cloud.trellix.com, default 'auth')
+    iam_issuer = os.getenv('IAM_ISSUER', 'auth')
     
     
     # setup logging

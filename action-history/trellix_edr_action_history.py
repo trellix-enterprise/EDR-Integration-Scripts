@@ -8,6 +8,7 @@ import getpass
 import requests
 import json
 import logging
+import os
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 
@@ -17,7 +18,11 @@ import trellix_edr_action_history_legacy
 class EDR():
     def __init__(self):
 
-        self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
+        # Support for multiple IAM issuers (default to 'auth')
+        if iam_issuer and iam_issuer.lower() == 'cloud':
+            self.iam_url = 'iam.cloud.trellix.com/iam/v1.0'
+        else:
+            self.iam_url = 'auth.trellix.com/auth/realms/IAM/protocol/openid-connect'
         self.base_url='api.manage.trellix.com'
         self.logging()
         
@@ -47,6 +52,7 @@ class EDR():
     def auth(self, creds):
         try:
 
+            # Payload is the same across IAM issuers
             payload = {
                 'scope': 'mi.user.investigate soc.act.tg soc.hts.c soc.hts.r soc.rts.c soc.rts.r soc.qry.pr',
                 'grant_type': 'client_credentials'
@@ -150,6 +156,9 @@ if __name__ == '__main__':
     if not args.client_secret:
         args.client_secret = getpass.getpass(
             prompt='MVISION EDR Client Secret: ')
+
+    # Read IAM issuer from environment (IAM_ISSUER). Accepts 'cloud' or 'auth'. Default: 'auth'
+    iam_issuer = os.getenv('IAM_ISSUER', 'auth')
 
     edr = EDR()
     edr.action_history()
