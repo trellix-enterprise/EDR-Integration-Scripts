@@ -14,7 +14,11 @@ The latter example will be described below.
 
 **Important** 
 
-Client_ID and Client_Secrets can get generated with the [trellix_edr_creds_generator.py](https://github.trellix.com/trellix-products/EDR-Integration-Scripts/blob/develop/trellix_edr_creds_generator.py) script posted in the main [repository](https://github.trellix.com/trellix-products/EDR-Integration-Scripts).
+Generate Client_ID and Client_Secret using the Trellix Client Credentials portal:
+
+- URL: https://uam.ui.trellix.com/clientcreds.html
+
+Ensure you grant the appropriate API scopes for EDR and store the credentials securely.
 
 ## Configuration
 

@@ -72,7 +72,9 @@ pip install requests python-dotenv pytz python-dateutil
 ```
 
 ### Trellix API Credentials
-You must obtain the following credentials from your Trellix developer portal:
+You must obtain the following credentials from the Trellix Client Credentials portal:
+
+- URL: https://uam.ui.trellix.com/clientcreds.html
 
 1. **EDR Client ID**: Client_ID
 2. **EDR Client Secret**: Secret 
