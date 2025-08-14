@@ -86,7 +86,7 @@ You must obtain the following credentials from the Trellix Client Credentials po
 
 **Required API Scopes:**
 ```
-soc.hts.c soc.hts.r soc.rts.c soc.rts.r soc.qry.pr soc.act.tg
+soc.act.tg
 ```
 
 ---
