@@ -14,6 +14,7 @@ import pytz
 from datetime import datetime, timedelta
 from dateutil import tz, parser as dateutil_parser
 from dotenv import load_dotenv
+from logging.handlers import SysLogHandler  # added
 
 load_dotenv(verbose=True)
 
@@ -30,7 +31,7 @@ def parse_iso_dt(value: str) -> datetime:
         try:
             return datetime.strptime(value, date_pattern).replace(tzinfo=pytz.UTC)
         except Exception:
-            # Best-effort final fallback (may still raise on some variants)
+            # final fallback
             return datetime.fromisoformat(value)
 
 class EDR():
@@ -183,6 +184,14 @@ class EDR():
                             alert_name = alert['attributes'].get('RuleId', 'Unknown')
                             logger.info('Retrieved new MVISION EDR Alert. {0}'.format(alert_name))
 
+                            # Syslog forwarding (optional)
+                            if 'syslog_ip' in globals() and 'syslog_port' in globals() and syslog_ip and syslog_port:
+                                try:
+                                    syslog.info(json.dumps(alert, sort_keys=True))
+                                    logger.info('Successfully sent alert to Syslog IP {}'.format(syslog_ip))
+                                except Exception as se:
+                                    logger.error('Failed to send alert to syslog: {}'.format(se))
+
                             if alerts_log and alerts_log.lower() == 'true':
                                 if os.path.exists(alert_dir) is False:
                                     os.mkdir(alert_dir)
@@ -202,9 +211,9 @@ class EDR():
                         logger.debug('No new alerts identified. Exiting. {0}'.format(res))
                         tnextflag = False
                 elif res.status_code==429:
-                     retry_interval=self.get_retryinterval(res)
-                     logger.debug('Rate Limit Exceed in Alerts Api, retrying after  {} sec'.format(retry_interval))
-                     time.sleep(int(retry_interval))            
+                    retry_interval=self.get_retryinterval(res)
+                    logger.debug('Rate Limit Exceed in Alerts Api, retrying after  {} sec'.format(retry_interval))
+                    time.sleep(int(retry_interval))
                 else:
                     logger.error('Error in retrieving edr.get_alerts(). Request url: {}'.format(res.url))
                     logger.error('Error in retrieving edr.get_alerts(). Request headers: {}'.format(res.request.headers))
@@ -247,7 +256,9 @@ if __name__ == '__main__':
     alerts_log = os.getenv('ALERT_LOG')
     alert_dir = os.getenv('ALERT_DIR')
     x_api_key=os.getenv('X_API_KEY')
-    
+    # Syslog (optional)
+    syslog_ip = os.getenv('SYSLOG_IP')
+    syslog_port = os.getenv('SYSLOG_PORT')
     
     # setup logging
     logger = logging.getLogger('mvedr_logger')
@@ -267,6 +278,16 @@ if __name__ == '__main__':
                                                         backupCount=5)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
+
+    # setup syslog logger if configured
+    if syslog_ip and syslog_port:
+        try:
+            syslog = logging.getLogger('syslog')
+            syslog.setLevel(log_level)
+            syslog.addHandler(SysLogHandler(address=(syslog_ip, int(syslog_port))))
+            logger.info('Syslog forwarding enabled to {}:{}'.format(syslog_ip, syslog_port))
+        except Exception as se:
+            logger.error('Failed to configure syslog handler: {}'.format(se))
 
     while True:
         try:

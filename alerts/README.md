@@ -23,14 +23,16 @@
 2. **Simplified Authentication**: Removed the `audience` parameter from authentication requests for cleaner integration
 3. **Dual IAM Support**: Added configurable support for both `auth.trellix.com` and `iam.cloud.trellix.com` environments
 4. **Streamlined Authentication Scope**: Simplified to use only `soc.act.tg` scope for both IAM environments
+5. **Syslog Forwarding (NEW)**: Optional forwarding of each processed alert JSON to a remote syslog server (UDP) when `SYSLOG_IP` and `SYSLOG_PORT` are set
 
 **Migration Impact:**
 - **Existing Deployments**: No action required - the script automatically uses the new default endpoint
 - **Custom Configurations**: If you explicitly set `IAM_ISSUER=cloud`, your configuration remains unchanged
 - **Credentials**: Your existing EDR credentials continue to work with the new endpoints
+- **Optional Syslog**: Add the new env vars if you want central log collection of raw alerts
 
 **Configuration Changes:**
-- New environment variable: `IAM_ISSUER` (defaults to 'auth')
+- New environment variables: `IAM_ISSUER`, `SYSLOG_IP`, `SYSLOG_PORT`
 - Updated default authentication URL: `auth.trellix.com/auth/realms/IAM/protocol/openid-connect`
 - Simplified authentication scope: Both IAM environments now use only `soc.act.tg` scope
 
@@ -39,6 +41,7 @@
 - Simplified configuration process
 - Better compatibility with latest Trellix EDR environments
 - Streamlined customer onboarding
+- Centralized alert forwarding (syslog)
 
 ---
 
@@ -53,6 +56,7 @@ The Trellix EDR Alerts Collection Script is designed to continuously retrieve se
 - **Individual Alert Storage**: Option to save each alert as a separate JSON file
 - **Rate Limit Handling**: Automatic retry logic for API rate limiting
 - **Token Management**: Automatic authentication token refresh every execution cycle
+- **Optional Syslog Forwarding**: Sends full JSON of each alert to remote syslog if configured
 
 ---
 
@@ -61,7 +65,7 @@ The Trellix EDR Alerts Collection Script is designed to continuously retrieve se
 ### System Requirements
 - **Operating System**: Linux, Windows, or macOS
 - **Python Version**: Python 3.6 or higher
-- **Network Access**: HTTPS connectivity to Trellix cloud services
+- **Network Access**: HTTPS connectivity to Trellix cloud services (and UDP/514 to syslog target if using syslog)
 - **Disk Space**: Minimum 1GB for logs and cache files
 
 ### Python Dependencies
@@ -154,6 +158,13 @@ LOG_LEVEL=INFO           # Logging level: DEBUG, INFO, WARNING, ERROR
 
 # Network Configuration (if behind proxy)
 PROXY=http://proxy.company.com:8080
+
+# IAM Issuer (default 'auth'; set to 'cloud' for legacy endpoint)
+IAM_ISSUER=auth
+
+# Syslog Forwarding (optional)
+SYSLOG_IP=10.10.10.10
+SYSLOG_PORT=514
 ```
 
 ### Sample .env File
@@ -173,6 +184,9 @@ ALERT_LOG=true
 LOG_LEVEL=INFO
 INTERVAL=600
 INITIAL_PULL=7
+IAM_ISSUER=auth
+SYSLOG_IP=10.10.10.10
+SYSLOG_PORT=514
 ```
 
 ---
@@ -220,6 +234,9 @@ Environment=ALERT_LOG=true
 Environment=LOG_LEVEL=INFO
 Environment=INTERVAL=300
 Environment=INITIAL_PULL=1
+Environment=IAM_ISSUER=auth
+Environment=SYSLOG_IP=10.10.10.10
+Environment=SYSLOG_PORT=514
 ExecStart=/usr/bin/python3 /opt/trellix-edr/trellix_edr_alerts.py
 Restart=always
 RestartSec=30
@@ -283,6 +300,11 @@ sudo systemctl status trellix-edr-alerts
 - **Location**: `${ALERT_DIR}/*.log` (when ALERT_LOG=true)
 - **Format**: `YYYYMMDDHHMMSS-RuleId.log`
 - **Content**: Complete JSON alert data
+
+#### Syslog Forwarding
+- **Protocol**: UDP (default syslog)
+- **Payload**: Raw JSON string of each alert
+- **Use Case**: Centralized SIEM ingestion or long-term storage
 
 ### Monitoring Script Health
 
@@ -390,6 +412,16 @@ DEBUG;Rate Limit Exceed in Alerts Api, retrying after 300 sec
 - Script automatically handles rate limiting with exponential backoff
 - Consider increasing INTERVAL to reduce API call frequency
 - Monitor API usage patterns
+
+#### 6. Syslog Not Receiving Alerts
+**Symptoms:**
+- No events appear on the remote syslog server
+
+**Solutions:**
+- Verify UDP connectivity to SYSLOG_IP:SYSLOG_PORT
+- Ensure firewall allows outbound UDP 514 (or custom port)
+- Confirm environment variables are set in service definition
+- Check for "Failed to configure syslog handler" errors at startup
 
 ### Debug Mode
 
@@ -550,6 +582,8 @@ For production deployments, consider implementing:
 | LOG_LEVEL | No | INFO | Logging verbosity level |
 | PROXY | No | None | HTTP proxy URL |
 | IAM_ISSUER | No | auth | IAM authentication issuer ('auth' or 'cloud') |
+| SYSLOG_IP | No | None | Remote syslog server IP (for alert forwarding) |
+| SYSLOG_PORT | No | 514 | Remote syslog server port (for alert forwarding) |
 
 ### File Structure
 ```
